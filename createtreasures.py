@@ -14,6 +14,11 @@ from os import path
 
 
 def getnumberofrolls():
+    '''
+    Randomizes number of roles from Wealth Treasure Size Chart.
+    Returns Result
+    :return:
+    '''
     numberofrolls = (((1, 30), 1),
                      ((31, 55), 2),
                      ((56, 75), 3),
@@ -30,6 +35,10 @@ def getnumberofrolls():
 
 
 def getrichness():
+    '''
+    Returns random result from "Magic Item Treasure Size Chart"
+    :return: List of integers
+    '''
     richnesstable = (
         ((1, 30), [0, 0, 0, 0, 2]),
         ((21, 40), [0, 0, 0, 1, 2]),
@@ -51,6 +60,12 @@ def getrichness():
 
 
 def getcomposition(richness, richnesstable):
+    '''
+    Returns Random Result from "Magic Item Treasure Composition Table" based on richness and richnesstable
+    :param richness: List of Integers as stated in getrichness
+    :param richnesstable: List of Strings
+    :return: List of Magic item Types
+    '''
     treasurecompositiontable = (
         ((1, 5), ["Normal", "Normal", "Normal", "Normal", "Normal"]),
         ((6, 10), ["Normal", "Normal", "Normal", "Light", "Light"]),
@@ -82,6 +97,11 @@ def getcomposition(richness, richnesstable):
 
 
 def getitemfrommagicitemscapabilitieschart(type):
+    '''
+    Provides an Random item / capability based on given type as stated in "Magic Items Cpabilities Chart"
+    :param type: "Light", "Bonus", "Sp. Bonus", "TYPE A", "TYPE B"
+    :return: String
+    '''
     magicitemstable = (
         ((1, 7), ["80%", "+5", "+ 1 Ess", "Staff", "Weapon", "1-H Slashing"]),
         ((8, 11), ["80%", "+5", "+1 Ess", "Staff", "Weapon", "1-H Concussion"]),
