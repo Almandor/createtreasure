@@ -148,6 +148,11 @@ def getitemfrommagicitemscapabilitieschart(type):
 
 
 def getitemandspelllevel(type="random"):
+    '''
+    Provides, if requested, type and level of magical Item based on "Item and Spell Level Chart"
+    :param type: Possible values: random, Runepaper, Potion, Singleuse, Daily1 - 4, Wand, Rod, Staff, Constant and Tome
+    :return: type, itemdetails as string
+    '''
     if type == "random":
         x = random.randint(1, 100)
         if 1 <= x <= 30:
@@ -175,6 +180,10 @@ def getitemandspelllevel(type="random"):
 
     listposition = ["filler", "Runepaper", "Potion", "Singleuse", "Daily1", "Daily2", "Daily3", "Daily4", "Wand",
                     "Rod", "Staff", "Constant", "Tome"]
+    if type not in listposition[1:]:
+        print("received unexpected value in getitemandspelllevel. Got: " + str(type))
+        raise
+    
     matchlist = (
         ((1, 20), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "1-5"),
         ((21, 25), 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 2, "1-5"),
@@ -200,7 +209,7 @@ def getitemandspelllevel(type="random"):
     print("Debug x: " + str(x))
     for item in matchlist:
         if item[0][0] <= x <= item[0][1]:
-            return type, item[listposition.index(type)]
+            return type, str(item[listposition.index(type)])
     print("Error. getitemandspelllevel failure. Item location not found. Aborting")
     exit()
 
