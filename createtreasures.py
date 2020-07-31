@@ -11,6 +11,7 @@ import random
 from sys import exit
 import pprint
 from os import path
+import re
 
 
 def getnumberofrolls():
@@ -183,7 +184,7 @@ def getitemandspelllevel(type="random"):
     if type not in listposition[1:]:
         print("received unexpected value in getitemandspelllevel. Got: " + str(type))
         raise
-    
+
     matchlist = (
         ((1, 20), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "1-5"),
         ((21, 25), 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 2, "1-5"),
@@ -254,6 +255,23 @@ def itemresult():
             print("Error! Type " + str(i) + " not found. Aborting!")
             exit()
 
+def translatespelllisttofile(listname):
+    '''
+    also evil magician --> evil essence,
+    Evil cleric --> evil channeling,
+    Evil mentalist --> evil mentalism
+    ach ja und für seer kannst du die dabbler nehmenNachricht eingeben
+    :param listname:
+    :return:
+    '''
+
+
+    listtofile = {
+        "Evil Magician Base Lists": "Essence_Evil",
+        "Evil Cleric Base Lists": "Channeling_Evil",
+        "Evil Mentalist Base Lists": "Mentalism_Evil",
+        "Essence_Magican_Base": "Base_List_Magican"
+    }
 
 def getspelllist():
     spelllist = (
@@ -496,18 +514,21 @@ def getmoney(rolls, treasurequality):
 
 
 def getspellfromfile(spell):
-    if spell["Listcategory"].find("Lists") != -1:
+    if spell["Listcategory"].find("List") != -1:
         buffer = spell["Listcategory"][:-6]
+        print("Debug Buffer: " + buffer)
     elif spell["Listcategory"].find("Evil") != -1:
         buffer = "Evil"
     else:
         print("getspellfromfile failed!")
         pprint.pprint(spell)
         exit()
-    buildfilepath = "./data/magic/" + spell["Category"] + "_" + buffer + "/" + spell["Spelllist"].replace("'", "").replace(" ", "_") + ".csv"
-    if not path.exists(buildfilepath):
+    buildfilepath = "./data/magic/" + spell["Category"] + "_" + buffer + "/" + spell["Spelllist"] + ".csv"
+    buildfilepath = buildfilepath.replace("'", "").replace(" ", "_")
+    filepath = translatespelllisttofile(buildfilepath)
+    if not path.exists(filepath):
         print("File not found:")
-        print(buildfilepath)
+        print(filepath)
     return spell
 
 # Main
