@@ -264,7 +264,7 @@ def translatespelllisttofile(listname):
     :param listname:
     :return:
     '''
-
+    print(listname)
 
     listtofile = {
         "Evil Magician Base Lists": "Essence_Evil",
@@ -272,12 +272,14 @@ def translatespelllisttofile(listname):
         "Evil Mentalist Base Lists": "Mentalism_Evil",
         "Essence_Magican_Base": "Base_List_Magican"
     }
+    return listname
+
 
 def getspelllist():
     spelllist = (
         ((1, 3), "Spell Defense", "Open Lists", "Spell Wall", "Open Lists", "Delving", "Open Lists",
          "Physical Erosion", "Evil Magician Base Lists"),
-        ((4, 6), "Barrier Law", "Open Lists", "Essence's Perception", "Open Lists", "Cloaking", "Open Lists",
+        ((4, 6), "Barrier Law", "Open Lists", "Essence's Perceptions", "Open Lists", "Cloaking", "Open Lists",
          "Matter Disruption", "Evil Magician Base Lists"),
         ((7, 9), "Detection Mastery", "Open Lists", "Rune Mastery", "Open Lists", "Damage Resistance", "Open Lists",
          "Dark Contacts", "Evil Magician Base Lists"),
@@ -514,21 +516,46 @@ def getmoney(rolls, treasurequality):
 
 
 def getspellfromfile(spell):
-    if spell["Listcategory"].find("List") != -1:
+    if spell["Listcategory"].find("Lists") != -1:
         buffer = spell["Listcategory"][:-6]
-        print("Debug Buffer: " + buffer)
     elif spell["Listcategory"].find("Evil") != -1:
         buffer = "Evil"
+    elif spell["Listcategory"].find("List") != -1:
+        buffer = spell["Listcategory"]
     else:
         print("getspellfromfile failed!")
         pprint.pprint(spell)
         exit()
-    buildfilepath = "./data/magic/" + spell["Category"] + "_" + buffer + "/" + spell["Spelllist"] + ".csv"
+    if buffer.find("Base") != -1:
+        buildfilepath = "./data/magic/" + buffer + "/" + spell["Spelllist"] + ".csv"
+    else:
+        buildfilepath = "./data/magic/" + spell["Category"] + "_" + buffer + "/" + spell["Spelllist"] + ".csv"
     buildfilepath = buildfilepath.replace("'", "").replace(" ", "_")
     filepath = translatespelllisttofile(buildfilepath)
     if not path.exists(filepath):
         print("File not found:")
         print(filepath)
+        print("Listcategory: " + spell["Listcategory"])
+        print("Category: " + spell["Category"])
+        print("Buffer: " + buffer)
+        print("Spelllist:" + spell["Spelllist"])
+    else:
+        count = len(open(filepath).readlines())
+        if count > 1:
+            with open(filepath) as csvfile:
+                save = {}
+                file = csv.DictReader(csvfile, delimiter=',', quotechar='"')
+                for row in file:
+                    if int(row["Lvl"]) < int(spell["Level"]):
+                        save = row
+                    elif int(row["Lvl"]) == int(spell["Level"]):
+                        spell["Data"] = row
+                        break
+                    else:
+                        spell["Data"] = save
+        else:
+            print("No data in file")
+
     return spell
 
 # Main
@@ -539,6 +566,8 @@ parser.add_argument('treasurequality', choices=range(1, 6), type=int, nargs="?")
 args = parser.parse_args()
 
 random.seed()
+
+print("\n\n")
 
 if args.treasuretype in ["money", "both"]:
 
@@ -584,7 +613,30 @@ if args.treasuretype == "debug":
     elif spell["Listcategory"].find("Healer") != -1:
         spell["Listcategory"] = "Base List Healer"
     elif spell["Listcategory"].find("Illusionist") != -1:
-        spell["Listcategory"] = "Base List Illusionist" # fortsetzen
+        spell["Listcategory"] = "Base List Illusionist"
+    elif spell["Listcategory"].find("Lay-Healer") != -1:
+        spell["Listcategory"] = "Base List Lay-Healer"
+    elif spell["Listcategory"].find("Magent") != -1:
+        spell["Listcategory"] = "Base List Magent"
+    elif spell["Listcategory"].find("Magician") != -1:
+        spell["Listcategory"] = "Base List Magician"
+    elif spell["Listcategory"].find("Mentalist") != -1:
+        spell["Listcategory"] = "Base List Mentalist"
+    elif spell["Listcategory"].find("Mystic") != -1:
+        spell["Listcategory"] = "Base List Mystic"
+    elif spell["Listcategory"].find("Paladin") != -1:
+        spell["Listcategory"] = "Base List Paladin"
+    elif spell["Listcategory"].find("Ranger") != -1:
+        spell["Listcategory"] = "Base List Ranger"
+    elif spell["Listcategory"].find("Sorcerer") != -1:
+        spell["Listcategory"] = "Base List Sorcerer"
+    elif spell["Listcategory"].find("Taoist-Monk") != -1:
+        spell["Listcategory"] = "Base List Taoist-Monk"
+    elif spell["Listcategory"].find("Zen-Monk") != -1:
+        spell["Listcategory"] = "Base List Zen-Monk"
+    elif spell["Listcategory"].find("Monk") != -1:
+        spell["Listcategory"] = "Base List Monk"
+
 
     spell["Level"] = b
     pprint.pprint(spell)
@@ -594,3 +646,5 @@ if args.treasuretype == "debug":
         print("Cursed!")
     else:
         spell = getspellfromfile(spell)
+    print("-----------")
+    pprint.pprint(spell)
