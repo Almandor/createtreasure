@@ -11,7 +11,34 @@ import random
 from sys import exit
 import pprint
 from os import path
-import re
+
+
+class ItemAndMoneyStore:
+    def __init__(self):
+        self.money = {
+            "mithril": 0,
+            "gold": 0,
+            "silber": 0,
+            "bronze": 0,
+            "kupfer": 0,
+            "zinn": 0
+        }
+
+        self.itemlist = []
+        self.itemcounter = 0
+
+    def additem(self):
+        self.itemcounter += 1
+        self.itemlist.append(Item(self.itemcounter))
+
+class Item:
+    def __init__(self):
+        self.itemtype = ""
+        self.weightreduction = 0
+        self.spelleffect = ""
+        self.spelllevel = 0
+        self.spelldescription = ""
+
 
 
 def getnumberofrolls():
@@ -146,6 +173,7 @@ def getitemfrommagicitemscapabilitieschart(type):
         if select[0][0] <= x <= select[0][1]:
             item = select[1][typetocolumnlist.index(type)]
     print(item)
+    return item
 
 
 def getitemandspelllevel(type="random"):
@@ -229,14 +257,72 @@ def retrieveitem(type):
 
 
 def retrievespell(type):
-    spelllist = getspelllist()
+    a, b = getitemandspelllevel()
+    print("Type: " + a)
+    spell = getspelllist()
+
+    if spell["Listcategory"].find("Animist") != -1:
+        spell["Listcategory"] = "Base List Animist"
+    elif spell["Listcategory"].find("Alchemist") != -1:
+        spell["Listcategory"] = "Base List Alchemist"
+    elif spell["Listcategory"].find("Bard") != -1:
+        spell["Listcategory"] = "Base List Bard"
+    elif spell["Listcategory"].find("Cleric") != -1:
+        spell["Listcategory"] = "Base List Cleric"
+    elif spell["Listcategory"].find("Dabbler") != -1:
+        spell["Listcategory"] = "Base List Dabbler"
+    elif spell["Listcategory"].find("Healer") != -1:
+        spell["Listcategory"] = "Base List Healer"
+    elif spell["Listcategory"].find("Illusionist") != -1:
+        spell["Listcategory"] = "Base List Illusionist"
+    elif spell["Listcategory"].find("Lay-Healer") != -1:
+        spell["Listcategory"] = "Base List Lay-Healer"
+    elif spell["Listcategory"].find("Magent") != -1:
+        spell["Listcategory"] = "Base List Magent"
+    elif spell["Listcategory"].find("Magician") != -1:
+        spell["Listcategory"] = "Base List Magician"
+    elif spell["Listcategory"].find("Mentalist") != -1:
+        spell["Listcategory"] = "Base List Mentalist"
+    elif spell["Listcategory"].find("Mystic") != -1:
+        spell["Listcategory"] = "Base List Mystic"
+    elif spell["Listcategory"].find("Paladin") != -1:
+        spell["Listcategory"] = "Base List Paladin"
+    elif spell["Listcategory"].find("Ranger") != -1:
+        spell["Listcategory"] = "Base List Ranger"
+    elif spell["Listcategory"].find("Sorcerer") != -1:
+        spell["Listcategory"] = "Base List Sorcerer"
+    elif spell["Listcategory"].find("Taoist-Monk") != -1:
+        spell["Listcategory"] = "Base List Taoist-Monk"
+    elif spell["Listcategory"].find("Zen-Monk") != -1:
+        spell["Listcategory"] = "Base List Zen-Monk"
+    elif spell["Listcategory"].find("Monk") != -1:
+        spell["Listcategory"] = "Base List Monk"
+
+    spell["Level"] = b
+    pprint.pprint(spell)
+    if spell["Listcategory"].lower() == "special":
+        print("Special!")
+    elif spell["Listcategory"].lower() == "cursed":
+        print("Cursed!")
+    else:
+        spell = getspellfromfile(spell)
+    return spell
 
 
 def retrieveartifact(type):
+    '''
+    todo: all
+    :param type:
+    :return:
+    '''
     pass
 
 
 def itemresult():
+    '''
+    todo: Fix Tome
+    :return:
+    '''
     richnesstable = ["Poor", "Very Poor", "Normal", "Rich", "Very Rich"]
     richness = getrichness()
     itemcompositionlist = getcomposition(richness, richnesstable)
@@ -251,9 +337,12 @@ def itemresult():
             a = [getitemorspelllevel("tome")[0], getitemorspelllevel("tome")[1]] + getspelllist()
         elif i == "Artifact":
             itemlist.append(retrieveartifact(i))
+        elif i == "Special":
+            itemlist.append("Special")
         else:
             print("Error! Type " + str(i) + " not found. Aborting!")
             exit()
+    return itemlist
 
 def translatespelllisttofile(listname):
     '''
@@ -593,58 +682,9 @@ if args.treasuretype in ["money", "both"]:
         print("Zinn: " + str(moneyresult["ZS"]))
 
 if args.treasuretype in ["magic", "both"]:
-    itemresult()
+    items = itemresult()
+    print("------------")
+    pprint.pprint(items)
 
 if args.treasuretype == "debug":
-    a, b = getitemandspelllevel()
-    print("Type: " + a)
-    spell = getspelllist()
-
-    if spell["Listcategory"].find("Animist") != -1:
-        spell["Listcategory"] = "Base List Animist"
-    elif spell["Listcategory"].find("Alchemist") != -1:
-        spell["Listcategory"] = "Base List Alchemist"
-    elif spell["Listcategory"].find("Bard") != -1:
-        spell["Listcategory"] = "Base List Bard"
-    elif spell["Listcategory"].find("Cleric") != -1:
-        spell["Listcategory"] = "Base List Cleric"
-    elif spell["Listcategory"].find("Dabbler") != -1:
-        spell["Listcategory"] = "Base List Dabbler"
-    elif spell["Listcategory"].find("Healer") != -1:
-        spell["Listcategory"] = "Base List Healer"
-    elif spell["Listcategory"].find("Illusionist") != -1:
-        spell["Listcategory"] = "Base List Illusionist"
-    elif spell["Listcategory"].find("Lay-Healer") != -1:
-        spell["Listcategory"] = "Base List Lay-Healer"
-    elif spell["Listcategory"].find("Magent") != -1:
-        spell["Listcategory"] = "Base List Magent"
-    elif spell["Listcategory"].find("Magician") != -1:
-        spell["Listcategory"] = "Base List Magician"
-    elif spell["Listcategory"].find("Mentalist") != -1:
-        spell["Listcategory"] = "Base List Mentalist"
-    elif spell["Listcategory"].find("Mystic") != -1:
-        spell["Listcategory"] = "Base List Mystic"
-    elif spell["Listcategory"].find("Paladin") != -1:
-        spell["Listcategory"] = "Base List Paladin"
-    elif spell["Listcategory"].find("Ranger") != -1:
-        spell["Listcategory"] = "Base List Ranger"
-    elif spell["Listcategory"].find("Sorcerer") != -1:
-        spell["Listcategory"] = "Base List Sorcerer"
-    elif spell["Listcategory"].find("Taoist-Monk") != -1:
-        spell["Listcategory"] = "Base List Taoist-Monk"
-    elif spell["Listcategory"].find("Zen-Monk") != -1:
-        spell["Listcategory"] = "Base List Zen-Monk"
-    elif spell["Listcategory"].find("Monk") != -1:
-        spell["Listcategory"] = "Base List Monk"
-
-
-    spell["Level"] = b
-    pprint.pprint(spell)
-    if spell["Listcategory"].lower() == "special":
-        print("Special!")
-    elif spell["Listcategory"].lower() == "cursed":
-        print("Cursed!")
-    else:
-        spell = getspellfromfile(spell)
-    print("-----------")
-    pprint.pprint(spell)
+    pass
