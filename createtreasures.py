@@ -21,15 +21,32 @@ class ItemAndMoneyStore:
             "silber": 0,
             "bronze": 0,
             "kupfer": 0,
-            "zinn": 0
+            "zinn": 0,
+            "edelsteine": 0,
+            "schmuckstücke": 0
         }
-
+        self.conversion = {
+            "MS": "mithril",
+            "GS": "gold",
+            "SS": "silber",
+            "BS": "bronze",
+            "KS": "kupfer",
+            "ZS": "zinn",
+            "ed": "edelsteine",
+            "sch": "schmuckstücke"
+        }
         self.itemlist = []
         self.itemcounter = 0
 
     def additem(self):
         self.itemcounter += 1
         self.itemlist.append(Item(self.itemcounter))
+
+    def addmoney(self, typ, amount):
+        self.money[self.conversion[typ]] += amount
+
+    def getmoney(self):
+        return self.money
 
 class Item:
     def __init__(self):
@@ -39,6 +56,30 @@ class Item:
         self.spelllevel = 0
         self.spelldescription = ""
 
+
+class Controller:
+    def __init__(self, selection, quality):
+        self.selection = selection
+        self.quality = quality
+        self.mais = ItemAndMoneyStore()
+        if self.selection.lower() in ["magic", "both"]:
+            self.magicitems()
+        if self.selection.lower() in ["money", "both"]:
+            self.money()
+
+    def magicitems(self):
+        pass
+
+    def money(self):
+        rollnumber = getnumberofrolls()
+
+        if not 1 <= int(self.quality) <= 5:
+            print("Please make Treasurequality between 1 and 5")
+            exit()
+
+        for i in range(1, rollnumber):
+            amount, typ = getmoney(self.quality)
+            self.mais.addmoney(typ, amount)
 
 
 def getnumberofrolls():
@@ -565,7 +606,7 @@ def getitemorspelllevel(type):
 
     return type, result[type][selected]
 
-def getmoney(rolls, treasurequality):
+def getmoney(treasurequality):
     money = (((1, 10), (50, "ZS"), (500, "ZS"), (1000, "ZS"), (5000, "ZS"), (10000, "ZS")),
              ((11, 20), (100, "ZS"), (1500, "ZS"), (3000, "ZS"), (7500, "ZS"), (5000, "KS")),
              ((21, 30), (500, "ZS"), (2500, "ZS"), (5000, "ZS"), (1000, "KS"), (10000, "KS")),
@@ -585,23 +626,12 @@ def getmoney(rolls, treasurequality):
              ((95, 97), (3, "GS"), (8, "GS"), (20, "Ed"), (80, "Ed"), (400, "Sch")),
              ((98, 99), (5, "GS"), (10, "Ed"), (50, "Ed"), (1, "MS"), (600, "Sch")),
              ((100, 100), (10, "Ed"), (25, "Sch"), (100, "Sch"), (500, "Sch"), (1000, "Sch")))
-    result = {}
-    if type(treasurequality) != int:
-        print("Treasuretype not configured. Please use Int between 1 and 5")
-        exit()
-    print("Rolling Treasure...")
 
-    for i in range(1, rolls + 1):
-        x = random.randrange(1, 100)
-        for select in money:
-            if select[0][0] <= x <= select[0][1]:
-                item = select[treasurequality]
-                if item[1] not in result:
-                    result[item[1]] = item[0]
-                else:
-                    result[item[1]] += item[0]
-
-    return result
+    x = random.randrange(1, 100)
+    for select in money:
+        if select[0][0] <= x <= select[0][1]:
+            item = select[treasurequality]
+    return item
 
 
 def getspellfromfile(spell):
@@ -657,6 +687,10 @@ args = parser.parse_args()
 random.seed()
 
 print("\n\n")
+
+control = Controller(args.treasuretype, args.treasurequality)
+
+exit()
 
 if args.treasuretype in ["money", "both"]:
 
