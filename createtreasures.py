@@ -59,27 +59,34 @@ class ItemAndMoneyStore:
 
 class Item:
     def __init__(self, itemtype):
-        self.itemtype = itemtype
-        self.weightreduction = ""
-        self.spelleffect = ""
-        self.spelllevel = 0
-        self.spelldescription = ""
-        self.spelllist = ""
-        self.spellcategory = ""
-        self.listcategory = ""
 
-        if self.itemtype == 'Light':
-            self.itemtype = getitemfrommagicitemscapabilitieschart("TYPE B")
-            self.weightreduction = getitemfrommagicitemscapabilitieschart("Light")
+        self.item = {
+            "itemtype": itemtype
+        }
+        # self.itemtype = itemtype
+        # self.weightreduction = ""
+        # self.spelleffect = ""
+        # self.spelllevel = ""
+        # self.spelldescription = ""
+        # self.spelllist = ""
+        # self.spellcategory = ""
+        # self.listcategory = ""
 
-        if self.itemtype == 'spell':
+        if self.item["itemtype"] == 'Light':
+            self.item["itemtype"] = getitemfrommagicitemscapabilitieschart("TYPE B")
+            self.item["weightreduction"] = getitemfrommagicitemscapabilitieschart("Light")
+
+        if self.item["itemtype"] == 'spell':
             buffer = getspelllist()
-            self.spelllist = buffer["Spelllist"]
-            self.listcategory = buffer["Listcategory"]
-            self. spellcategory = buffer["Category"]
+            self.item["spelllist"] = buffer["Spelllist"]
+            self.item["listcategory"] = buffer["Listcategory"]
+            self.item["spellcategory"] = buffer["Category"]
+            self.item["itemtype"], self.item["spelllevel"] = getitemorspelllevel("random")
+            buffer = retrievespell(self.item["itemtype"], self.item["spelllevel"])
+            print(buffer)
 
     def getitem(self):
-        return str(self.itemtype), str(self.weightreduction)
+        return str(self.item)
 
 
 
@@ -101,7 +108,7 @@ class Controller:
 
     def debugmethod(self):
         x = Item("spell")
-        print(x)
+        print(x.getitem())
 
     def magicitems(self):
         rollnumber = getrichness()
@@ -332,9 +339,8 @@ def retrieveitem(type):
         pass
 
 
-def retrievespell(type):
+def retrievespell(a, b):
     a, b = getitemandspelllevel()
-    print("Type: " + a)
     spell = getspelllist()
 
     if spell["Listcategory"].find("Animist") != -1:
