@@ -38,9 +38,9 @@ class ItemAndMoneyStore:
         self.itemlist = []
         self.itemcounter = 0
 
-    def additem(self):
+    def additem(self, itemtype):
         self.itemcounter += 1
-        self.itemlist.append(Item(self.itemcounter))
+        self.itemlist.append(itemtype)
 
     def addmoney(self, typ, amount):
         self.money[self.conversion[typ]] += amount
@@ -48,13 +48,40 @@ class ItemAndMoneyStore:
     def getmoney(self):
         return self.money
 
+    def getitems(self):
+        for item in self.itemlist:
+            a, b = item.getitem()
+            if b != "":
+                print(a + " - " + str(b))
+            else:
+                print(a)
+
+
 class Item:
-    def __init__(self):
-        self.itemtype = ""
-        self.weightreduction = 0
+    def __init__(self, itemtype):
+        self.itemtype = itemtype
+        self.weightreduction = ""
         self.spelleffect = ""
         self.spelllevel = 0
         self.spelldescription = ""
+        self.spelllist = ""
+        self.spellcategory = ""
+        self.listcategory = ""
+
+        if self.itemtype == 'Light':
+            self.itemtype = getitemfrommagicitemscapabilitieschart("TYPE B")
+            self.weightreduction = getitemfrommagicitemscapabilitieschart("Light")
+
+        if self.itemtype == 'spell':
+            buffer = getspelllist()
+            self.spelllist = buffer["Spelllist"]
+            self.listcategory = buffer["Listcategory"]
+            self. spellcategory = buffer["Category"]
+
+    def getitem(self):
+        return str(self.itemtype), str(self.weightreduction)
+
+
 
 
 class Controller:
@@ -66,14 +93,29 @@ class Controller:
             self.magicitems()
         if self.selection.lower() in ["money", "both"]:
             self.money()
+        if self.selection.lower() == "debug":
+            print("Debug")
+            self.debugmethod()
+        self.mais.getitems()
+
+
+    def debugmethod(self):
+        x = Item("spell")
+        print(x)
 
     def magicitems(self):
-        pass
+        rollnumber = getrichness()
+        counter = 0
+        for i in rollnumber:
+            counter += 1
+            if i > 0:
+                for x in range(1, i):
+                    self.mais.additem(Item(getcomposition(counter - 1)))
 
     def money(self):
         rollnumber = getnumberofrolls()
 
-        if not 1 <= int(self.quality) <= 5:
+        if not self.quality or not 1 <= int(self.quality) <= 5:
             print("Please make Treasurequality between 1 and 5")
             exit()
 
@@ -121,14 +163,13 @@ def getrichness():
         ((100, 100), [4, 5, 6, 8, 10])
     )
     x = random.randrange(1, 100)
-    print("Roll: " + str(x))
     for select in richnesstable:
         if select[0][0] <= x <= select[0][1]:
             item = select[1]
     return (item)
 
 
-def getcomposition(richness, richnesstable):
+def getcomposition(element):
     '''
     Returns Random Result from "Magic Item Treasure Composition Table" based on richness and richnesstable
     :param richness: List of Integers as stated in getrichness
@@ -152,16 +193,11 @@ def getcomposition(richness, richnesstable):
         ((98, 99), ["Sp. Bonus", "Sp. Bonus", "Tome", "Special", "Special"]),
         ((100, 100), ["Special", "Special", "Special", "Special", "Artifact"])
     )
-    treasurecomposition = []
-    for element in range(len(richness)):
-        if richness[element] > 0:
-            print(str(richness[element]) + "x " + richnesstable[element])
-            for i in range(richness[element]):
-                x = random.randrange(1, 100)
-                print("Roll: " + str(x))
-                for select in treasurecompositiontable:
-                    if select[0][0] <= x <= select[0][1]:
-                        treasurecomposition.append(select[1][element])
+    x = random.randrange(1, 100)
+    treasurecomposition = ""
+    for select in treasurecompositiontable:
+        if select[0][0] <= x <= select[0][1]:
+            treasurecomposition = select[1][element]
     return treasurecomposition
 
 
@@ -213,7 +249,6 @@ def getitemfrommagicitemscapabilitieschart(type):
     for select in magicitemstable:
         if select[0][0] <= x <= select[0][1]:
             item = select[1][typetocolumnlist.index(type)]
-    print(item)
     return item
 
 
@@ -686,7 +721,6 @@ args = parser.parse_args()
 
 random.seed()
 
-print("\n\n")
 
 control = Controller(args.treasuretype, args.treasurequality)
 
