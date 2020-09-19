@@ -3,6 +3,9 @@
 '''
 Programname: createtrasures.py
 Description: Rolemaster-Support tool to generate Treasure
+
+ToDo: Handle Level HL (Higher Level than normal)
+ToDo: Find Error UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 325: character maps to <undefined>
 '''
 
 import argparse
@@ -11,6 +14,7 @@ import random
 from sys import exit
 import pprint
 from os import path
+import logging
 
 
 class ItemAndMoneyStore:
@@ -63,20 +67,12 @@ class Item:
         self.item = {
             "itemtype": itemtype
         }
-        # self.itemtype = itemtype
-        # self.weightreduction = ""
-        # self.spelleffect = ""
-        # self.spelllevel = ""
-        # self.spelldescription = ""
-        # self.spelllist = ""
-        # self.spellcategory = ""
-        # self.listcategory = ""
 
-        if self.item["itemtype"] == 'Light':
+        if self.item["itemtype"].lower() == 'light':
             self.item["itemtype"] = getitemfrommagicitemscapabilitieschart("TYPE B")
             self.item["weightreduction"] = getitemfrommagicitemscapabilitieschart("Light")
 
-        if self.item["itemtype"] == 'spell':
+        if self.item["itemtype"].lower() == 'spell':
             buffer = getspelllist()
             self.item["spelllist"] = buffer["Spelllist"]
             self.item["listcategory"] = buffer["Listcategory"]
@@ -86,6 +82,8 @@ class Item:
             print(buffer)
 
     def getitem(self):
+        print(self.item)
+        exit()
         return str(self.item)
 
 
@@ -700,13 +698,18 @@ def getspellfromfile(spell):
         print("Buffer: " + buffer)
         print("Spelllist:" + spell["Spelllist"])
     else:
-        count = len(open(filepath).readlines())
+        try:
+            count = len(open(filepath).readlines()) # ToDo: Find Error UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 325: character maps to <undefined>
+        except Exception as e:
+            print(filepath)
+            print(e)
+
         if count > 1:
             with open(filepath) as csvfile:
                 save = {}
                 file = csv.DictReader(csvfile, delimiter=',', quotechar='"')
                 for row in file:
-                    if int(row["Lvl"]) < int(spell["Level"]):
+                    if int(row["Lvl"]) < int(spell["Level"]):     # ToDo: Handle Level HL (Higher Level than normal)
                         save = row
                     elif int(row["Lvl"]) == int(spell["Level"]):
                         spell["Data"] = row
