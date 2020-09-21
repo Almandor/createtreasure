@@ -317,9 +317,15 @@ def getitemandspelllevel(type="random"):
     )
     x = random.randint(1, 100)
     print("Debug x: " + str(x))
+    save = ""
     for item in matchlist:
         if item[0][0] <= x <= item[0][1]:
             return type, str(item[listposition.index(type)])
+        elif str(item[listposition.index(type)]) == "HL":
+            return type, save + str(item[listposition.index(type)])
+        else:
+            save = str(item[listposition.index(type)])
+
     print("Error. getitemandspelllevel failure. Item location not found. Aborting")
     exit()
 
@@ -708,6 +714,8 @@ def getspellfromfile(spell):
             with open(filepath) as csvfile:
                 save = {}
                 file = csv.DictReader(csvfile, delimiter=',', quotechar='"')
+                if spell["Level"].endswith("HL"):
+                    spell["Level"] = random.randint(int(spell["Level"][:-2]) + 1, 50) # Fix for HighLevel Spells. Random Level between last found spell level and level 50.
                 for row in file:
                     if int(row["Lvl"]) < int(spell["Level"]):     # ToDo: Handle Level HL (Higher Level than normal)
                         save = row
