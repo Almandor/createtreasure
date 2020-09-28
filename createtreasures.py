@@ -4,8 +4,8 @@
 Programname: createtrasures.py
 Description: Rolemaster-Support tool to generate Treasure
 
-ToDo: Handle Level HL (Higher Level than normal)
 ToDo: Find Error UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 325: character maps to <undefined>
+ToDo: Add Sp. Bonusitems
 '''
 
 import argparse
@@ -684,36 +684,3 @@ random.seed()
 
 
 control = Controller(args.treasuretype, args.treasurequality)
-
-exit()
-
-if args.treasuretype in ["money", "both"]:
-
-    rolls = getnumberofrolls()
-    moneyresult = getmoney(rolls, args.treasurequality)
-
-    print("Geldwerte:")
-    if "Sch" in moneyresult:
-        print("Schmuckstücke: " + str(moneyresult["Sch"]))
-    if "Ed" in moneyresult:
-        print("Edelsteine: " + str(moneyresult["Ed"]))
-    if "MS" in moneyresult:
-        print("Mithril: " + str(moneyresult["MS"]))
-    if "GS" in moneyresult:
-        print("Gold: " + str(moneyresult["GS"]))
-    if "SS" in moneyresult:
-        print("Silber: " + str(moneyresult["SS"]))
-    if "BS" in moneyresult:
-        print("Bronze: " + str(moneyresult["BS"]))
-    if "KS" in moneyresult:
-        print("Kupfer: " + str(moneyresult["KS"]))
-    if "ZS" in moneyresult:
-        print("Zinn: " + str(moneyresult["ZS"]))
-
-if args.treasuretype in ["magic", "both"]:
-    items = itemresult()
-    print("------------")
-    pprint.pprint(items)
-
-if args.treasuretype == "debug":
-    pass
