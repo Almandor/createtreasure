@@ -53,12 +53,13 @@ class ItemAndMoneyStore:
         return self.money
 
     def getitems(self):
+        counter = 0
         for item in self.itemlist:
-            a, b = item.getitem()
-            if b != "":
-                print(a + " - " + str(b))
-            else:
-                print(a)
+            counter += 1
+            print("\nItem " + str(counter))
+            a = item.getitem()
+            for key, value in a.items():
+                print(str(key) + ": " + str(value))
 
 
 class Item:
@@ -68,6 +69,10 @@ class Item:
             "itemtype": itemtype
         }
 
+        if self.item["itemtype"].lower() == 'bonus':
+            self.item["itemtype"] = getitemfrommagicitemscapabilitieschart("TYPE B")
+            self.item["bonus"] = getitemfrommagicitemscapabilitieschart("Bonus")
+
         if self.item["itemtype"].lower() == 'light':
             self.item["itemtype"] = getitemfrommagicitemscapabilitieschart("TYPE B")
             self.item["weightreduction"] = getitemfrommagicitemscapabilitieschart("Light")
@@ -75,16 +80,14 @@ class Item:
         if self.item["itemtype"].lower() == 'spell':
             buffer = getspelllist()
             self.item["spelllist"] = buffer["Spelllist"]
-            self.item["listcategory"] = buffer["Listcategory"]
+            self.item["listcategory"] = buffer["listcategory"]
             self.item["spellcategory"] = buffer["Category"]
-            self.item["itemtype"], self.item["spelllevel"] = getitemorspelllevel("random")
-            buffer = retrievespell(self.item["itemtype"], self.item["spelllevel"])
-            print(buffer)
+            self.item["itemtype"] = getrandomitemtype()
+            self.item["spelllevel"] = getspelllevel(self.item["itemtype"])
+            self.item["spelldescription"] = retrievespell(dict(self.item))
 
     def getitem(self):
-        print(self.item)
-        exit()
-        return str(self.item)
+        return self.item
 
 
 
@@ -206,6 +209,28 @@ def getcomposition(element):
     return treasurecomposition
 
 
+
+def getadditionalmagicitemcapabilities(oldtype):
+    additionalcapabilities = ["Light", "Bonus", "Sp. Bonus"]
+    compabilitiestable = (
+        ((41, 50), [["Bonus"], ["Light"], ["Nothing"]]),
+        ((51, 75), [["Bonus"], ["Light"], ["Light"]]),
+        ((76, 88), [["Spell"], ["Spell"], ["Spell"]]),
+        ((89, 91), [["Sp. Bonus"], ["Sp. Bonus"], ["Bonus"]]),
+        ((92, 94), [["Bonus", "Spell"], ["Light", "Spell"], ["Light", "Spell"]]),
+        ((95, 96), [["Sp. Bonus", "Spell"], ["Light", "Sp. Bonus"], ["Light", "Bonus"]]),
+        ((97, 98), [["Bonus", "Sp. Bonus"], ["Sp. Bonus", "Spell"], ["Bonus", "Spell"]]),
+        ((99, 99), [["Bonus", "Sp. Bonus", "Spell"], ["Light", "Sp. Bonus", "Spell"], ["Light", "Bonus", "Spell"]]),
+        ((100, 100), [["Special"], ["Special"], ["Special"]])
+    )
+    x = random.randrange(1, 100)
+    buffer = ""
+    for select in compabilitiestable:
+        if select[0][0] <= x <= select[0][1]:
+            buffer = select[1][additionalcapabilities.index(oldtype)]
+    return buffer
+
+
 def getitemfrommagicitemscapabilitieschart(type):
     '''
     Provides an Random item / capability based on given type as stated in "Magic Items Cpabilities Chart"
@@ -257,78 +282,6 @@ def getitemfrommagicitemscapabilitieschart(type):
     return item
 
 
-def getitemandspelllevel(type="random"):
-    '''
-    Provides, if requested, type and level of magical Item based on "Item and Spell Level Chart"
-    :param type: Possible values: random, Runepaper, Potion, Singleuse, Daily1 - 4, Wand, Rod, Staff, Constant and Tome
-    :return: type, itemdetails as string
-    '''
-    if type == "random":
-        x = random.randint(1, 100)
-        if 1 <= x <= 30:
-            type = "Runepaper"
-        elif 31 <= x <= 50:
-            type = "Potion"
-        elif 51 <= x <= 65:
-            type = "Singleuse"
-        elif 66 <= x <= 70:
-            type = "Daily1"
-        elif 71 <= x <= 75:
-            type = "Daily2"
-        elif 76 <= x <= 80:
-            type = "Daily3"
-        elif 81 <= x <= 85:
-            type = "Daily4"
-        elif 86 <= x <= 94:
-            type = "Wand"
-        elif 95 <= x <= 98:
-            type = "Rod"
-        elif  x == 99:
-            type = "Staff"
-        else:
-            type = "Constant"
-
-    listposition = ["filler", "Runepaper", "Potion", "Singleuse", "Daily1", "Daily2", "Daily3", "Daily4", "Wand",
-                    "Rod", "Staff", "Constant", "Tome"]
-    if type not in listposition[1:]:
-        print("received unexpected value in getitemandspelllevel. Got: " + str(type))
-        raise
-
-    matchlist = (
-        ((1, 20), 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "1-5"),
-        ((21, 25), 2, 1, 2, 1, 1, 1, 1, 1, 1, 2, 2, "1-5"),
-        ((26, 30), 2, 1, 2, 1, 1, 1, 1, 1, 1, 3, 2, "6-10"),
-        ((31, 35), 2, 2, 3, 1, 1, 1, 1, 1, 2, 3, 3, "6-10"),
-        ((36, 40), 2, 2, 3, 2, 1, 1, 1, 1, 2, 4, 3, "6-10"),
-        ((41, 45), 3, 2, 4, 2, 2, 1, 1, 1, 2, 4, 4, "6-10"),
-        ((46, 50), 3, 2, 4, 2, 2, 2, 1, 1, 2, 5, 4, "1-10"),
-        ((51, 55), 3, 2, 5, 3, 2, 2, 1, 1, 2, 5, 5, "1-10"),
-        ((56, 60), 4, 3, 5, 3, 2, 2, 2, 2, 3, 6, 5, "1-10"),
-        ((61, 65), 4, 3, 6, 4, 3, 2, 2, 2, 3, 6, 6, "1-10"),
-        ((66, 70), 5, 4, 6, 4, 3, 2, 2, 2, 3, 7, 6, "1-10"),
-        ((71, 75), 5, 4, 7, 5, 3, 3, 2, 2, 3, 7, 7, "11-20"),
-        ((76, 80), 6, 5, 7, 5, 4, 3, 2, 2, 4, 8, 7, "11-20"),
-        ((81, 85), 7, 6, 8, 6, 4, 3, 2, 2, 4, 8, 8, "11-20"),
-        ((86, 90), 8, 7, 9, 7, 5, 4, 3, 2, 4, 9, 8, "1-20"),
-        ((91, 94), 9, 8, 10, 8, 5, 4, 3, 2, 5, 9, 9, "1-20"),
-        ((95, 97), 10, 9, "HL", 9, 6, 5, 3, 2, 5, 10, 10, "1-25"),
-        ((98, 99), "HL", 10, "HL", 10, 7, 5, 3, 2, 5, 10, 10, "1-30"),
-        ((100, 100), "HL", "HL", "HL", "HL", "HL", "HL", "HL", 2, 5, "HL", "HL", "l-50")
-    )
-    x = random.randint(1, 100)
-    print("Debug x: " + str(x))
-    save = ""
-    for item in matchlist:
-        if item[0][0] <= x <= item[0][1]:
-            return type, str(item[listposition.index(type)])
-        elif str(item[listposition.index(type)]) == "HL":
-            return type, save + str(item[listposition.index(type)])
-        else:
-            save = str(item[listposition.index(type)])
-
-    print("Error. getitemandspelllevel failure. Item location not found. Aborting")
-    exit()
-
 def retrieveitem(type):
     if type == "Light":
         item = getitemfrommagicitemscapabilitieschart("TYPE B")
@@ -343,52 +296,47 @@ def retrieveitem(type):
         pass
 
 
-def retrievespell(a, b):
-    a, b = getitemandspelllevel()
-    spell = getspelllist()
+def retrievespell(spell):
+    if spell["listcategory"].find("Animist") != -1:
+        spell["listcategory"] = "Base List Animist"
+    elif spell["listcategory"].find("Alchemist") != -1:
+        spell["listcategory"] = "Base List Alchemist"
+    elif spell["listcategory"].find("Bard") != -1:
+        spell["listcategory"] = "Base List Bard"
+    elif spell["listcategory"].find("Cleric") != -1:
+        spell["listcategory"] = "Base List Cleric"
+    elif spell["listcategory"].find("Dabbler") != -1:
+        spell["listcategory"] = "Base List Dabbler"
+    elif spell["listcategory"].find("Healer") != -1:
+        spell["listcategory"] = "Base List Healer"
+    elif spell["listcategory"].find("Illusionist") != -1:
+        spell["listcategory"] = "Base List Illusionist"
+    elif spell["listcategory"].find("Lay-Healer") != -1:
+        spell["listcategory"] = "Base List Lay-Healer"
+    elif spell["listcategory"].find("Magent") != -1:
+        spell["listcategory"] = "Base List Magent"
+    elif spell["listcategory"].find("Magician") != -1:
+        spell["listcategory"] = "Base List Magician"
+    elif spell["listcategory"].find("Mentalist") != -1:
+        spell["listcategory"] = "Base List Mentalist"
+    elif spell["listcategory"].find("Mystic") != -1:
+        spell["listcategory"] = "Base List Mystic"
+    elif spell["listcategory"].find("Paladin") != -1:
+        spell["listcategory"] = "Base List Paladin"
+    elif spell["listcategory"].find("Ranger") != -1:
+        spell["listcategory"] = "Base List Ranger"
+    elif spell["listcategory"].find("Sorcerer") != -1:
+        spell["listcategory"] = "Base List Sorcerer"
+    elif spell["listcategory"].find("Taoist-Monk") != -1:
+        spell["listcategory"] = "Base List Taoist-Monk"
+    elif spell["listcategory"].find("Zen-Monk") != -1:
+        spell["listcategory"] = "Base List Zen-Monk"
+    elif spell["listcategory"].find("Monk") != -1:
+        spell["listcategory"] = "Base List Monk"
 
-    if spell["Listcategory"].find("Animist") != -1:
-        spell["Listcategory"] = "Base List Animist"
-    elif spell["Listcategory"].find("Alchemist") != -1:
-        spell["Listcategory"] = "Base List Alchemist"
-    elif spell["Listcategory"].find("Bard") != -1:
-        spell["Listcategory"] = "Base List Bard"
-    elif spell["Listcategory"].find("Cleric") != -1:
-        spell["Listcategory"] = "Base List Cleric"
-    elif spell["Listcategory"].find("Dabbler") != -1:
-        spell["Listcategory"] = "Base List Dabbler"
-    elif spell["Listcategory"].find("Healer") != -1:
-        spell["Listcategory"] = "Base List Healer"
-    elif spell["Listcategory"].find("Illusionist") != -1:
-        spell["Listcategory"] = "Base List Illusionist"
-    elif spell["Listcategory"].find("Lay-Healer") != -1:
-        spell["Listcategory"] = "Base List Lay-Healer"
-    elif spell["Listcategory"].find("Magent") != -1:
-        spell["Listcategory"] = "Base List Magent"
-    elif spell["Listcategory"].find("Magician") != -1:
-        spell["Listcategory"] = "Base List Magician"
-    elif spell["Listcategory"].find("Mentalist") != -1:
-        spell["Listcategory"] = "Base List Mentalist"
-    elif spell["Listcategory"].find("Mystic") != -1:
-        spell["Listcategory"] = "Base List Mystic"
-    elif spell["Listcategory"].find("Paladin") != -1:
-        spell["Listcategory"] = "Base List Paladin"
-    elif spell["Listcategory"].find("Ranger") != -1:
-        spell["Listcategory"] = "Base List Ranger"
-    elif spell["Listcategory"].find("Sorcerer") != -1:
-        spell["Listcategory"] = "Base List Sorcerer"
-    elif spell["Listcategory"].find("Taoist-Monk") != -1:
-        spell["Listcategory"] = "Base List Taoist-Monk"
-    elif spell["Listcategory"].find("Zen-Monk") != -1:
-        spell["Listcategory"] = "Base List Zen-Monk"
-    elif spell["Listcategory"].find("Monk") != -1:
-        spell["Listcategory"] = "Base List Monk"
-
-    spell["Level"] = b
-    pprint.pprint(spell)
-    if spell["Listcategory"].lower() == "special":
+    if spell["listcategory"].lower() == "special":
         print("Special!")
-    elif spell["Listcategory"].lower() == "cursed":
+    elif spell["listcategory"].lower() == "cursed":
         print("Cursed!")
     else:
         spell = getspellfromfile(spell)
@@ -404,31 +352,32 @@ def retrieveartifact(type):
     pass
 
 
-def itemresult():
-    '''
-    todo: Fix Tome
-    :return:
-    '''
-    richnesstable = ["Poor", "Very Poor", "Normal", "Rich", "Very Rich"]
-    richness = getrichness()
-    itemcompositionlist = getcomposition(richness, richnesstable)
-    print(itemcompositionlist)
-    itemlist = []
-    for i in itemcompositionlist:
-        if i in ["Normal", "Light", "Bonus", "Sp. Bonus"]:
-            itemlist.append(retrieveitem(i))
-        elif i == "Spell":
-            itemlist.append(retrievespell(i))
-        elif i == "Tome":
-            a = [getitemorspelllevel("tome")[0], getitemorspelllevel("tome")[1]] + getspelllist()
-        elif i == "Artifact":
-            itemlist.append(retrieveartifact(i))
-        elif i == "Special":
-            itemlist.append("Special")
-        else:
-            print("Error! Type " + str(i) + " not found. Aborting!")
-            exit()
-    return itemlist
+# def itemresult():
+#     '''
+#     todo: Fix Tome
+#     :return:
+#     '''
+#     richnesstable = ["Poor", "Very Poor", "Normal", "Rich", "Very Rich"]
+#     richness = getrichness()
+#     itemcompositionlist = getcomposition(richness, richnesstable)
+#     itemlist = []
+#     for i in itemcompositionlist:
+#         print(i)
+#         if i in ["Normal", "Light", "Bonus", "Sp. Bonus"]:
+#             itemlist.append(retrieveitem(i))
+#         elif i == "Spell":
+#             itemlist.append(retrievespell(i))
+#             print("Debug: Got Spell")
+#         elif i == "Tome":
+#             a = [getitemorspelllevel("tome")[0], getitemorspelllevel("tome")[1]] + getspelllist()
+#         elif i == "Artifact":
+#             itemlist.append(retrieveartifact(i))
+#         elif i == "Special":
+#             itemlist.append("Special")
+#         else:
+#             print("Error! Type " + str(i) + " not found. Aborting!")
+#             exit()
+#     return itemlist
 
 def translatespelllisttofile(listname):
     '''
@@ -439,7 +388,7 @@ def translatespelllisttofile(listname):
     :param listname:
     :return:
     '''
-    print(listname)
+    # print(listname)
 
     listtofile = {
         "Evil Magician Base Lists": "Essence_Evil",
@@ -561,34 +510,39 @@ def getspelllist():
     for select in spelllist:
         if select[0][0] <= x <= select[0][1]:
             spell["Spelllist"] = select[spelltype]
-            spell["Listcategory"] = select[spelltype + 1]
+            spell["listcategory"] = select[spelltype + 1]
     spell["Category"] = spellcat
     return spell
 
 
-def getitemorspelllevel(type):
+def getrandomitemtype():
+    itemtype = ""
+    items = (
+        ((1, 30), "runepaper"),
+        ((31, 50), "potion"),
+        ((51, 65), "singleuse"),
+        ((66, 70), "daily1"),
+        ((71, 75), "daily2"),
+        ((76, 80), "daily3"),
+        ((81, 85), "daily4"),
+        ((86, 94), "wand"),
+        ((95, 98), "rod"),
+        ((99, 99), "staff"),
+        ((100, 100), "constant")
+    )
+    x = random.randrange(1, 100)
+    for select in items:
+        if select[0][0] <= x <= select[0][1]:
+            itemtype = select[1]
+    return itemtype
+
+
+def getspelllevel(type):
     '''
-    :param type: possible parameters random, runepaper, singleuse, daily1, daily2, daily3, daily4, wand, rod, staff, constant, tome
+    :param type: possible parameters runepaper, singleuse, daily1, daily2, daily3, daily4, wand, rod, staff, constant, tome
     :return:
     '''
-    if type == "random":
-        items = (
-            ((1, 30), "runepaper"),
-            ((31, 50), "potion"),
-            ((51, 65), "singleuse"),
-            ((66, 70), "daily1"),
-            ((71, 75), "daily2"),
-            ((76, 80), "daily3"),
-            ((81, 85), "daily4"),
-            ((86, 94), "wand"),
-            ((95, 98), "rod"),
-            ((99, 99), "staff"),
-            ((100, 100), "constant")
-        )
-        x = random.randrange(1, 100)
-        for select in items:
-            if select[0][0] <= x <= select[0][1]:
-                type = select[1]
+
 
     matchmatrix = (
         (1, 20),
@@ -622,34 +576,23 @@ def getitemorspelllevel(type):
 
 
     result = {
-        "runepaper": ["1st", "2nd", "2nd", "2nd", "2nd", "3rd", "3rd", "3rd", "4th", "4th", "5th", "5th", "6th", "7th",
-                      "8th", "9th", "10th", "HL", "HL"],
-        "potion": ["1st", "1st", "1st", "2nd", "2nd", "2nd", "2nd", "2nd", "3rd", "3rd", "4th", "4th", "5th", "6th",
-                   "7th", "8th", "9th", "10th", "HL"],
-        "singleuse": ["1st", "2nd", "2nd", "3rd", "3rd", "4th", "4th", "5th", "5th", "6th", "6th", "7th", "7th", "8th",
-                      "9th", "10th", "HL", "HL", "HL"],
-        "daily1": ["1st", "1st", "1st", "1st", "2nd", "2nd", "2nd", "3rd", "3rd", "4rd", "4th", "5th", "5th", "6th",
-                   "7th", "8th", "9th", "10th", "HL"],
-        "daily2": ["1st", "1st", "1st", "1st", "1st", "2nd", "2nd", "2nd", "2nd", "3rd", "3rd", "3rd", "4th", "4th",
-                   "5th", "5th", "6th", "7th", "HL"],
-        "daily3": ["1st", "1st", "1st", "1st", "1st", "1st", "2nd", "2nd", "2nd", "2nd", "2nd", "3rd", "3rd", "3rd",
-                   "4th", "4th", "5th", "5th", "HL"],
-        "daily4": ["1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "2nd", "2nd", "2nd", "2nd", "2nd", "2nd",
-                   "3rd", "3rd", "3rd", "3rd", "HL"],
-        "wand": ["1st", "1st", "1st", "1st", "1st", "1st", "1st", "1st", "2nd", "2nd", "2nd", "2nd", "2nd", "2nd",
-                 "2nd", "2nd", "2nd", "2nd", "2nd"],
-        "rod": ["1st", "1st", "1st", "2nd", "2nd", "2nd", "2nd", "2nd", "3rd", "3rd", "3rd", "3rd", "4th", "4th", "4th",
-                "5th", "5th", "5th", "5th"],
-        "staff": ["1st", "2nd", "3rd", "3rd", "4th", "4th", "5th", "5th", "6th", "6th", "7th", "7th", "8th", "8th",
-                  "9th", "9th", "10th", "10th", "HL"],
-        "constant": ["1st", "2nd", "2nd", "3rd", "3rd", "4th", "4th", "5th", "5th", "6th", "6th", "7th", "7th", "8th",
-                     "8th", "9th", "10th", "10th", "HL"],
-        "tome": ["lst-5th", "lst-5th", "6th- 10th", "6th- 10th", "6th- 10th", "6th- 10th", "1st- 10th", "1st- 10th",
-                 "1st- 10th", "1st- 10th", "1st- 10th", "llth-20th", "llth- 20th", "llth-20th", "lst-20th", "lst-20th",
-                 "lst-25th", "lst-30th", "lst-50th"]
+        "runepaper": ["1", "2", "2", "2", "2", "3", "3", "3", "4", "4", "5", "5", "6", "7", "8", "9", "10", "HL", "HL"],
+        "potion": ["1", "1", "1", "2", "2", "2", "2", "2", "3", "3", "4", "4", "5", "6", "7", "8", "9", "10", "HL"],
+        "singleuse": ["1", "2", "2", "3", "3", "4", "4", "5", "5", "6", "6", "7", "7", "8", "9", "10", "HL", "HL", "HL"],
+        "daily1": ["1", "1", "1", "1", "2", "2", "2", "3", "3", "4", "4", "5", "5", "6", "7", "8", "9", "10", "HL"],
+        "daily2": ["1", "1", "1", "1", "1", "2", "2", "2", "2", "3", "3", "3", "4", "4", "5", "5", "6", "7", "HL"],
+        "daily3": ["1", "1", "1", "1", "1", "1", "2", "2", "2", "2", "2", "3", "3", "3", "4", "4", "5", "5", "HL"],
+        "daily4": ["1", "1", "1", "1", "1", "1", "1", "1", "2", "2", "2", "2", "2", "2", "3", "3", "3", "3", "HL"],
+        "wand": ["1", "1", "1", "1", "1", "1", "1", "1", "2", "2", "2", "2", "2", "2", "2", "2", "2", "2", "2"],
+        "rod": ["1", "1", "1", "2", "2", "2", "2", "2", "3", "3", "3", "3", "4", "4", "4", "5", "5", "5", "5"],
+        "staff": ["1", "2", "3", "3", "4", "4", "5", "5", "6", "6", "7", "7", "8", "8", "9", "9", "10", "10", "HL"],
+        "constant": ["1", "2", "2", "3", "3", "4", "4", "5", "5", "6", "6", "7", "7", "8", "8", "9", "10", "10", "HL"],
+        "tome": ["1-5", "1-5", "6- 10", "6- 10", "6- 10", "6- 10", "1- 10", "1- 10",
+                 "1-10", "1-10", "1-10", "11-20", "11- 20", "11-20", "1-20", "1-20",
+                 "1-25", "1-30", "1-50"]
     }
 
-    return type, result[type][selected]
+    return result[type][selected]
 
 def getmoney(treasurequality):
     money = (((1, 10), (50, "ZS"), (500, "ZS"), (1000, "ZS"), (5000, "ZS"), (10000, "ZS")),
@@ -680,54 +623,54 @@ def getmoney(treasurequality):
 
 
 def getspellfromfile(spell):
-    if spell["Listcategory"].find("Lists") != -1:
-        buffer = spell["Listcategory"][:-6]
-    elif spell["Listcategory"].find("Evil") != -1:
+    if spell["listcategory"].find("Lists") != -1:
+        buffer = spell["listcategory"][:-6]
+    elif spell["listcategory"].find("Evil") != -1:
         buffer = "Evil"
-    elif spell["Listcategory"].find("List") != -1:
-        buffer = spell["Listcategory"]
+    elif spell["listcategory"].find("List") != -1:
+        buffer = spell["listcategory"]
     else:
         print("getspellfromfile failed!")
         pprint.pprint(spell)
         exit()
     if buffer.find("Base") != -1:
-        buildfilepath = "./data/magic/" + buffer + "/" + spell["Spelllist"] + ".csv"
+        buildfilepath = "./data/magic/" + buffer + "/" + spell["spelllist"] + ".csv"
     else:
-        buildfilepath = "./data/magic/" + spell["Category"] + "_" + buffer + "/" + spell["Spelllist"] + ".csv"
+        buildfilepath = "./data/magic/" + spell["spellcategory"] + "_" + buffer + "/" + spell["spelllist"] + ".csv"
     buildfilepath = buildfilepath.replace("'", "").replace(" ", "_")
     filepath = translatespelllisttofile(buildfilepath)
+
     if not path.exists(filepath):
-        print("File not found:")
-        print(filepath)
-        print("Listcategory: " + spell["Listcategory"])
-        print("Category: " + spell["Category"])
-        print("Buffer: " + buffer)
-        print("Spelllist:" + spell["Spelllist"])
+        spell["data"] = "File not found: " + str(filepath)
     else:
         try:
             count = len(open(filepath).readlines()) # ToDo: Find Error UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 325: character maps to <undefined>
         except Exception as e:
             print(filepath)
             print(e)
+            count = 0
 
         if count > 1:
             with open(filepath) as csvfile:
                 save = {}
                 file = csv.DictReader(csvfile, delimiter=',', quotechar='"')
-                if spell["Level"].endswith("HL"):
-                    spell["Level"] = random.randint(int(spell["Level"][:-2]) + 1, 50) # Fix for HighLevel Spells. Random Level between last found spell level and level 50.
+                if spell["spelllevel"].endswith("HL"):
+                    spell["spelllevel"] = random.randint(int(spell["Level"][:-2]) + 1, 50) # Fix for HighLevel Spells. Random Level between last found spell level and level 50.
                 for row in file:
-                    if int(row["Lvl"]) < int(spell["Level"]):     # ToDo: Handle Level HL (Higher Level than normal)
+                    if int(row["Lvl"]) < int(spell["spelllevel"]):
                         save = row
-                    elif int(row["Lvl"]) == int(spell["Level"]):
-                        spell["Data"] = row
+                    elif int(row["Lvl"]) == int(spell["spelllevel"]):
+                        spell["data"] = row
                         break
                     else:
-                        spell["Data"] = save
+                        spell["data"] = save
         else:
-            print("No data in file")
+            spell["data"] = "No Data in File: " + str(filepath)
 
-    return spell
+    if "data" in spell:
+        return spell["data"]
+    else:
+        return ""
 
 # Main
 
@@ -736,6 +679,7 @@ parser.add_argument('treasuretype', choices=["money", "magic", "both", "debug"],
 parser.add_argument('treasurequality', choices=range(1, 6), type=int, nargs="?")
 args = parser.parse_args()
 
+mode = "debug"
 random.seed()
 
 
