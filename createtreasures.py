@@ -209,7 +209,6 @@ def getcomposition(element):
     return treasurecomposition
 
 
-
 def getadditionalmagicitemcapabilities(oldtype):
     additionalcapabilities = ["Light", "Bonus", "Sp. Bonus"]
     compabilitiestable = (
@@ -224,11 +223,14 @@ def getadditionalmagicitemcapabilities(oldtype):
         ((100, 100), [["Special"], ["Special"], ["Special"]])
     )
     x = random.randrange(1, 100)
-    buffer = ""
-    for select in compabilitiestable:
-        if select[0][0] <= x <= select[0][1]:
-            buffer = select[1][additionalcapabilities.index(oldtype)]
-    return buffer
+    if x < 41:
+        return ["Nothing"]
+    else:
+        buffer = ""
+        for select in compabilitiestable:
+            if select[0][0] <= x <= select[0][1]:
+                buffer = select[1][additionalcapabilities.index(oldtype)]
+        return buffer
 
 
 def getitemfrommagicitemscapabilitieschart(type):
