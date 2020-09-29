@@ -1,0 +1,14 @@
+PS C:\Users\Chris\PycharmProjects\createtreasures> python .\createtreasures.py magic
+Special!
+Traceback (most recent call last):
+  File ".\createtreasures.py", line 699, in <module>
+    control = Controller(args.treasuretype, args.treasurequality)
+  File ".\createtreasures.py", line 112, in __init__
+    self.magicitems()
+  File ".\createtreasures.py", line 132, in magicitems
+    self.mais.additem(Item(getcomposition(counter - 1)))
+  File ".\createtreasures.py", line 97, in __init__
+    self.item["spelllevel_" + str(self.itemcounter)] = getspelllevel(self.item["itemtype"])
+  File ".\createtreasures.py", line 608, in getspelllevel
+    return result[type][selected]
+KeyError: 'Rigid Leather Armor'
