@@ -5,7 +5,8 @@ Programname: createtrasures.py
 Description: Rolemaster-Support tool to generate Treasure
 
 ToDo: Find Error UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 325: character maps to <undefined>
-ToDo: Add Sp. Bonusitems
+ToDo: Add Sp. Bonusitems,
+ToDo: Add Output of Money
 '''
 
 import argparse
@@ -85,7 +86,6 @@ class Item:
                 if self.item["itemtype"].lower() in ["bonus", "light", "sp. bonus", "spell"]:
                     self.item["itemtype"] = getitemfrommagicitemscapabilitieschart("TYPE A")
 
-
             if item.lower() == 'light':
                 if self.item["itemtype"].lower() in ["bonus", "light", "sp. bonus", "spell"]:
                     self.item["itemtype"] = getitemfrommagicitemscapabilitieschart("TYPE B")
@@ -115,9 +115,6 @@ class Item:
                     return counter
         else:
             return type
-
-
-
 
 
 class Controller:
@@ -381,33 +378,6 @@ def retrieveartifact(type):
     '''
     pass
 
-
-# def itemresult():
-#     '''
-#     todo: Fix Tome
-#     :return:
-#     '''
-#     richnesstable = ["Poor", "Very Poor", "Normal", "Rich", "Very Rich"]
-#     richness = getrichness()
-#     itemcompositionlist = getcomposition(richness, richnesstable)
-#     itemlist = []
-#     for i in itemcompositionlist:
-#         print(i)
-#         if i in ["Normal", "Light", "Bonus", "Sp. Bonus"]:
-#             itemlist.append(retrieveitem(i))
-#         elif i == "Spell":
-#             itemlist.append(retrievespell(i))
-#             print("Debug: Got Spell")
-#         elif i == "Tome":
-#             a = [getitemorspelllevel("tome")[0], getitemorspelllevel("tome")[1]] + getspelllist()
-#         elif i == "Artifact":
-#             itemlist.append(retrieveartifact(i))
-#         elif i == "Special":
-#             itemlist.append("Special")
-#         else:
-#             print("Error! Type " + str(i) + " not found. Aborting!")
-#             exit()
-#     return itemlist
 
 def translatespelllisttofile(listname):
     '''
