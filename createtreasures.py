@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+# -*- coding: UTF8 -*-
+
 
 '''
 Programname: createtrasures.py
@@ -6,7 +8,6 @@ Description: Rolemaster-Support tool to generate Treasure
 
 ToDo: Find Error UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 325: character maps to <undefined>
 ToDo: Add Sp. Bonusitems,
-ToDo: Add Output of Money
 '''
 
 import argparse
@@ -37,11 +38,12 @@ class ItemAndMoneyStore:
             "BS": "bronze",
             "KS": "kupfer",
             "ZS": "zinn",
-            "ed": "edelsteine",
-            "sch": "schmuckstücke"
+            "Ed": "edelsteine",
+            "Sch": "schmuckstücke"
         }
         self.itemlist = []
         self.itemcounter = 0
+        self.moneyorderlist = ["mithril", "gold", "bronze", "kupfer", "zinn", "edelsteine", "schmuckstücke"]
 
     def additem(self, itemtype):
         self.itemcounter += 1
@@ -51,7 +53,10 @@ class ItemAndMoneyStore:
         self.money[self.conversion[typ]] += amount
 
     def getmoney(self):
-        return self.money
+        for key in self.moneyorderlist:
+            # print(key)
+            if key in self.money:
+                print(key + ": " + str(self.money[key]))
 
     def getitems(self):
         counter = 0
@@ -129,7 +134,14 @@ class Controller:
         if self.selection.lower() == "debug":
             print("Debug")
             self.debugmethod()
-        self.mais.getitems()
+        if self.selection.lower() in ["magic", "both"]:
+            self.mais.getitems()
+        if self.selection.lower() in ["money", "both"]:
+            self.mais.getmoney()
+        if self.selection.lower() == "debug":
+            print("Debug")
+            self.debugmethod()
+
 
 
     def debugmethod(self):
