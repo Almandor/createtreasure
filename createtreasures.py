@@ -8,6 +8,7 @@ Description: Rolemaster-Support tool to generate Treasure
 
 ToDo: Find Error UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 325: character maps to <undefined>
 ToDo: Add Sp. Bonusitems,
+# Todo: if key == "Spells": Spells ausgeben
 '''
 
 import argparse
@@ -66,9 +67,60 @@ class ItemAndMoneyStore:
             a = item.getitem()
             for key, value in a.items():
                 print(str(key) + ": " + str(value))
+            # Todo: if key == "Spells": Spells ausgeben
 
 
 class Item:
+
+    class Spell:
+        def __init__(self, itemtype):
+            self.list = ""
+            self.listcategory = ""
+            self.category = ""
+            self.level = ""
+            self.description = ""
+            self.uses = ""
+            self.itemtype = itemtype
+            self.name = ""
+            self.aoe = "None"
+            self.duration = "None"
+            self.type = "None"
+            self.range = "None"
+
+        def debug(self):
+            print("Spellclass")
+            print(self.list)
+            print(self.listcategory)
+            print(self.level)
+            print(self.description)
+            print(self.uses)
+            print(self.itemtype)
+            exit()
+
+        def fill(self):
+            buffer = getspelllist()
+            self.list = buffer["Spelllist"]
+            self.listcategory = buffer["listcategory"]
+            self.category = buffer["Category"]
+            self.level = getspelllevel(translatespellcapacity(self.itemtype))
+            self.buffer = retrievespell(self.listcategory, self.list, self.level, self.category)
+            print(type(self.buffer))
+            if type(self.buffer) == "Dict":
+                if "Lvl" in self.buffer:
+                    self.level = self.buffer["Lvl"]
+                if "Duration" in self.buffer:
+                    self.duration = self.buffer["Duration"]
+                if "Spell" in self.buffer:
+                    self.name = self.buffer["Spell"]
+                if "Area of Effect" in self.buffer:
+                    self.aoe = self.buffer["Area of Effect"]
+                if "Range" in self.buffer:
+                    self.range = self.buffer["Range"]
+                if "Description" in self.buffer:
+                    self.description = self.buffer["Description"]
+
+
+
     def __init__(self, itemtype):
 
         self.item = {
@@ -98,15 +150,18 @@ class Item:
                     self.item["weightreduction"] = getitemfrommagicitemscapabilitieschart("Light")
 
             if item.lower() == 'spell':
+                if 'spells' not in self.item:
+                    self.item["spells"] = []
+
                 if self.item["itemtype"].lower() in ["bonus", "light", "sp. bonus", "spell"]:
                     self.item["itemtype"] = getrandomitemtype()
-                buffer = getspelllist()
-                self.item[self.getlastelement("spellist")] = buffer["Spelllist"]
-                self.item[self.getlastelement("listcategory")] = buffer["listcategory"]
-                self.item[self.getlastelement("spellcategory")] = buffer["Category"]
-                self.item[self.getlastelement("spellevel")] = getspelllevel(self.item["itemtype"])
-                buffer = self.item[self.getlastelement("spellevel")]
-                self.item[self.getlastelement("spelldescription")] = retrievespell(buffer)
+
+                buffer = self.Spell(self.item["itemtype"])
+                buffer.fill()
+                self.item["spells"].append(buffer)
+
+
+
 
     def getitem(self):
         return self.item
@@ -188,6 +243,29 @@ def getnumberofrolls():
     for i in numberofrolls:
         if i[0][0] <= x <= i[0][1]:
             return i[1]
+
+
+def translatespellcapacity(itemtype):
+    wand = ["wand"]
+    rod = ["rod"]
+    staff = ["staff"]
+    other = ["constant", "daily", "singleuse", "runepaper", "potion"]
+
+    for item in wand:
+        if item in itemtype:
+            return "wand"
+    for item in rod:
+        if item in itemtype:
+            return "rod"
+    for item in staff:
+        if item in itemtype:
+            return "staff"
+    for item in other:
+        return item
+
+    print("Unknown Itemtype " + str(itemtype))
+    print("Aborting...")
+    exit()
 
 
 def getrichness():
@@ -335,50 +413,50 @@ def retrieveitem(type):
         pass
 
 
-def retrievespell(spell):
-    if spell["listcategory"].find("Animist") != -1:
-        spell["listcategory"] = "Base List Animist"
-    elif spell["listcategory"].find("Alchemist") != -1:
-        spell["listcategory"] = "Base List Alchemist"
-    elif spell["listcategory"].find("Bard") != -1:
-        spell["listcategory"] = "Base List Bard"
-    elif spell["listcategory"].find("Cleric") != -1:
-        spell["listcategory"] = "Base List Cleric"
-    elif spell["listcategory"].find("Dabbler") != -1:
-        spell["listcategory"] = "Base List Dabbler"
-    elif spell["listcategory"].find("Healer") != -1:
-        spell["listcategory"] = "Base List Healer"
-    elif spell["listcategory"].find("Illusionist") != -1:
-        spell["listcategory"] = "Base List Illusionist"
-    elif spell["listcategory"].find("Lay-Healer") != -1:
-        spell["listcategory"] = "Base List Lay-Healer"
-    elif spell["listcategory"].find("Magent") != -1:
-        spell["listcategory"] = "Base List Magent"
-    elif spell["listcategory"].find("Magician") != -1:
-        spell["listcategory"] = "Base List Magician"
-    elif spell["listcategory"].find("Mentalist") != -1:
-        spell["listcategory"] = "Base List Mentalist"
-    elif spell["listcategory"].find("Mystic") != -1:
-        spell["listcategory"] = "Base List Mystic"
-    elif spell["listcategory"].find("Paladin") != -1:
-        spell["listcategory"] = "Base List Paladin"
-    elif spell["listcategory"].find("Ranger") != -1:
-        spell["listcategory"] = "Base List Ranger"
-    elif spell["listcategory"].find("Sorcerer") != -1:
-        spell["listcategory"] = "Base List Sorcerer"
-    elif spell["listcategory"].find("Taoist-Monk") != -1:
-        spell["listcategory"] = "Base List Taoist-Monk"
-    elif spell["listcategory"].find("Zen-Monk") != -1:
-        spell["listcategory"] = "Base List Zen-Monk"
-    elif spell["listcategory"].find("Monk") != -1:
-        spell["listcategory"] = "Base List Monk"
+def retrievespell(listcategory, spelllist, level, spellcategory):
+    if listcategory.find("Animist") != -1:
+        listcategory = "Base List Animist"
+    elif listcategory.find("Alchemist") != -1:
+        listcategory = "Base List Alchemist"
+    elif listcategory.find("Bard") != -1:
+        listcategory = "Base List Bard"
+    elif listcategory.find("Cleric") != -1:
+        listcategory = "Base List Cleric"
+    elif listcategory.find("Dabbler") != -1:
+        listcategory = "Base List Dabbler"
+    elif listcategory.find("Healer") != -1:
+        listcategory = "Base List Healer"
+    elif listcategory.find("Illusionist") != -1:
+        listcategory = "Base List Illusionist"
+    elif listcategory.find("Lay-Healer") != -1:
+        listcategory = "Base List Lay-Healer"
+    elif listcategory.find("Magent") != -1:
+        listcategory = "Base List Magent"
+    elif listcategory.find("Magician") != -1:
+        listcategory = "Base List Magician"
+    elif listcategory.find("Mentalist") != -1:
+        listcategory = "Base List Mentalist"
+    elif listcategory.find("Mystic") != -1:
+        listcategory = "Base List Mystic"
+    elif listcategory.find("Paladin") != -1:
+        listcategory = "Base List Paladin"
+    elif listcategory.find("Ranger") != -1:
+        listcategory = "Base List Ranger"
+    elif listcategory.find("Sorcerer") != -1:
+        listcategory = "Base List Sorcerer"
+    elif listcategory.find("Taoist-Monk") != -1:
+        listcategory = "Base List Taoist-Monk"
+    elif listcategory.find("Zen-Monk") != -1:
+        listcategory = "Base List Zen-Monk"
+    elif listcategory.find("Monk") != -1:
+        listcategory = "Base List Monk"
 
-    if spell["listcategory"].lower() == "special":
-        print("Special!")
-    elif spell["listcategory"].lower() == "cursed":
-        print("Cursed!")
+    if listcategory.lower() == "special":
+        spell = "special"
+    elif listcategory.lower() == "cursed":
+        spell = "cursed"
     else:
-        spell = getspellfromfile(spell)
+        spell = getspellfromfile(listcategory, spelllist, level, spellcategory)
     return spell
 
 
@@ -634,26 +712,26 @@ def getmoney(treasurequality):
     return item
 
 
-def getspellfromfile(spell):
-    if spell["listcategory"].find("Lists") != -1:
-        buffer = spell["listcategory"][:-6]
-    elif spell["listcategory"].find("Evil") != -1:
+def getspellfromfile(listcategory, spelllist, level, spellcategory):
+    if listcategory.find("Lists") != -1:
+        buffer = listcategory[:-6]
+    elif listcategory.find("Evil") != -1:
         buffer = "Evil"
-    elif spell["listcategory"].find("List") != -1:
-        buffer = spell["listcategory"]
+    elif listcategory.find("List") != -1:
+        buffer = listcategory
     else:
         print("getspellfromfile failed!")
-        pprint.pprint(spell)
+        print(listcategory + "\n" + spelllist + "\n" + str(level))
         exit()
     if buffer.find("Base") != -1:
-        buildfilepath = "./data/magic/" + buffer + "/" + spell["spelllist"] + ".csv"
+        buildfilepath = "./data/magic/" + buffer + "/" + spelllist + ".csv"
     else:
-        buildfilepath = "./data/magic/" + spell["spellcategory"] + "_" + buffer + "/" + spell["spelllist"] + ".csv"
+        buildfilepath = "./data/magic/" + spellcategory + "_" + buffer + "/" + spelllist + ".csv"
     buildfilepath = buildfilepath.replace("'", "").replace(" ", "_")
     filepath = translatespelllisttofile(buildfilepath)
 
     if not path.exists(filepath):
-        spell["data"] = "File not found: " + str(filepath)
+        data = "File not found: " + str(filepath)
     else:
         try:
             count = len(open(filepath).readlines()) # ToDo: Find Error UnicodeDecodeError: 'charmap' codec can't decode byte 0x9d in position 325: character maps to <undefined>
@@ -666,21 +744,21 @@ def getspellfromfile(spell):
             with open(filepath) as csvfile:
                 save = {}
                 file = csv.DictReader(csvfile, delimiter=',', quotechar='"')
-                if spell["spelllevel"].endswith("HL"):
-                    spell["spelllevel"] = random.randint(int(spell["Level"][:-2]) + 1, 50) # Fix for HighLevel Spells. Random Level between last found spell level and level 50.
+                if level.endswith("HL"):
+                    level = random.randint(int(level[:-2]) + 1, 50) # Fix for HighLevel Spells. Random Level between last found spell level and level 50.
                 for row in file:
-                    if int(row["Lvl"]) < int(spell["spelllevel"]):
+                    if int(row["Lvl"]) < int(level):
                         save = row
-                    elif int(row["Lvl"]) == int(spell["spelllevel"]):
-                        spell["data"] = row
+                    elif int(row["Lvl"]) == int(level):
+                        data = row
                         break
                     else:
-                        spell["data"] = save
+                        data = save
         else:
-            spell["data"] = "No Data in File: " + str(filepath)
+            data = "No Data in File: " + str(filepath)
 
-    if "data" in spell:
-        return spell["data"]
+    if data:
+        return data
     else:
         return ""
 
