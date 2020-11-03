@@ -65,59 +65,62 @@ class ItemAndMoneyStore:
             counter += 1
             print("\nItem " + str(counter))
             a = item.getitem()
-            for key, value in a.items():
-                print(str(key) + ": " + str(value))
-            # Todo: if key == "Spells": Spells ausgeben
+            for key, values in a.items():
+                if key == "spells":
+                    for value in values:
+                        data = value.output()
+                        for element in data:
+                            print(str(element) + ": " + str(data[element]))
+                else:
+                    print(str(key) + ": " + str(values))
 
 
 class Item:
 
     class Spell:
         def __init__(self, itemtype):
-            self.list = ""
-            self.listcategory = ""
-            self.category = ""
-            self.level = ""
-            self.description = ""
-            self.uses = ""
-            self.itemtype = itemtype
-            self.name = ""
-            self.aoe = "None"
-            self.duration = "None"
-            self.type = "None"
-            self.range = "None"
-
-        def debug(self):
-            print("Spellclass")
-            print(self.list)
-            print(self.listcategory)
-            print(self.level)
-            print(self.description)
-            print(self.uses)
-            print(self.itemtype)
-            exit()
+            self.data = {
+                "Spelllist": "",
+                "Listcategory": "",
+                "Spellcategory": "",
+                "Level": "",
+                "Description": "",
+                "Uses": "",
+                "Itemtype": itemtype,
+                "Name": "",
+                "AoE": "None",
+                "Duration": "None",
+                "Type": "None",
+                "Range": "None"
+            }
 
         def fill(self):
             buffer = getspelllist()
-            self.list = buffer["Spelllist"]
-            self.listcategory = buffer["listcategory"]
-            self.category = buffer["Category"]
-            self.level = getspelllevel(translatespellcapacity(self.itemtype))
-            self.buffer = retrievespell(self.listcategory, self.list, self.level, self.category)
+            self.data["Spelllist"] = buffer["Spelllist"]
+            self.data["Listcategory"] = buffer["listcategory"]
+            self.data["Spellcategory"] = buffer["Category"]
+            self.data["Level"] = getspelllevel(translatespellcapacity(self.data["Itemtype"]))
+            self.buffer = retrievespell(self.data["Listcategory"], self.data["Spelllist"], self.data["Level"], self.data["Spellcategory"])
             print(type(self.buffer))
-            if type(self.buffer) == "Dict":
+            if isinstance(self.buffer, dict):
                 if "Lvl" in self.buffer:
-                    self.level = self.buffer["Lvl"]
+                    self.data["Level"] = self.buffer["Lvl"]
                 if "Duration" in self.buffer:
-                    self.duration = self.buffer["Duration"]
+                    self.data["Duration"] = self.buffer["Duration"]
                 if "Spell" in self.buffer:
-                    self.name = self.buffer["Spell"]
+                    self.data["Name"] = self.buffer["Spell"]
                 if "Area of Effect" in self.buffer:
-                    self.aoe = self.buffer["Area of Effect"]
+                    self.data["AoE"] = self.buffer["Area of Effect"]
                 if "Range" in self.buffer:
-                    self.range = self.buffer["Range"]
+                    self.data["Range"] = self.buffer["Range"]
                 if "Description" in self.buffer:
-                    self.description = self.buffer["Description"]
+                    self.data["Description"] = self.buffer["Description"]
+            else:
+                self.data["Description"] = self.buffer
+
+        def output(self):
+            return self.data
+
 
 
 
@@ -222,6 +225,10 @@ class Controller:
         for i in range(1, rollnumber):
             amount, typ = getmoney(self.quality)
             self.mais.addmoney(typ, amount)
+
+
+def output(object, objecttype):
+    pass
 
 
 def getnumberofrolls():
