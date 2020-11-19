@@ -16,9 +16,32 @@ import csv
 import random
 from sys import exit
 import pprint
-from os import path
+from os import path, remove
 import logging
+import json
 
+class filewriter:
+    def __init__(self):
+        self.items = {}
+        self.money = {}
+        self.final = []
+
+    def add(self,element, value):
+        if element == "items":
+            self.items = value
+        elif element == "money":
+            self.money = value
+
+    def finalize(self):
+        print("------------------------------")
+        print(self.items)
+        print(self.money)
+        if len(self.items) > 0:
+            self.final.append(self.items)
+        if len(self.money) > 0:
+            self.final.append(self.money)
+        with open("treasure.json", "a") as outfile:
+            json.dump(self.final, outfile)
 
 class ItemAndMoneyStore:
     def __init__(self):
@@ -54,25 +77,40 @@ class ItemAndMoneyStore:
         self.money[self.conversion[typ]] += amount
 
     def getmoney(self):
+        mymoneydict = {}
         for key in self.moneyorderlist:
-            # print(key)
             if key in self.money:
+                mymoneydict[str(key)] = str(self.money[key])
                 print(key + ": " + str(self.money[key]))
+        final = {"money": mymoneydict}
+        return final
+
 
     def getitems(self):
         counter = 0
+        itemdict = {}
         for item in self.itemlist:
             counter += 1
-            print("\nItem " + str(counter))
             a = item.getitem()
+            itemname = "item_" + str(counter)
+            itemdict[itemname] = {}
             for key, values in a.items():
                 if key == "spells":
+                    spellcounter = 0
+                    spelllist = {}
                     for value in values:
+                        spellcounter += 1
+                        spellname = "spell_" + str(spellcounter)
+                        spelllist[spellname] = {}
                         data = value.output()
                         for element in data:
-                            print(str(element) + ": " + str(data[element]))
+                            spelllist[spellname][str(element)] = str(data[element])
+                        itemdict[itemname][spellname] = spelllist[spellname]
                 else:
-                    print(str(key) + ": " + str(values))
+                    itemdict[itemname][str(key)] = str(values)
+        print("Generated " + str(counter) + " items")
+        final = {"items": itemdict}
+        return final
 
 
 class Item:
@@ -101,7 +139,6 @@ class Item:
             self.data["Spellcategory"] = buffer["Category"]
             self.data["Level"] = getspelllevel(translatespellcapacity(self.data["Itemtype"]))
             self.buffer = retrievespell(self.data["Listcategory"], self.data["Spelllist"], self.data["Level"], self.data["Spellcategory"])
-            print(type(self.buffer))
             if isinstance(self.buffer, dict):
                 if "Lvl" in self.buffer:
                     self.data["Level"] = self.buffer["Lvl"]
@@ -120,9 +157,6 @@ class Item:
 
         def output(self):
             return self.data
-
-
-
 
     def __init__(self, itemtype):
 
@@ -185,26 +219,23 @@ class Controller:
         self.selection = selection
         self.quality = quality
         self.mais = ItemAndMoneyStore()
+        self.deletefile()
+        self.filewriter = filewriter()
         if self.selection.lower() in ["magic", "both"]:
             self.magicitems()
         if self.selection.lower() in ["money", "both"]:
             self.money()
-        if self.selection.lower() == "debug":
-            print("Debug")
-            self.debugmethod()
         if self.selection.lower() in ["magic", "both"]:
-            self.mais.getitems()
+            self.filewriter.add("items", self.mais.getitems())
         if self.selection.lower() in ["money", "both"]:
-            self.mais.getmoney()
-        if self.selection.lower() == "debug":
-            print("Debug")
-            self.debugmethod()
+            self.filewriter.add("money", self.mais.getmoney())
+        self.filewriter.finalize()
 
 
 
-    def debugmethod(self):
-        x = Item("spell")
-        print(x.getitem())
+    def deletefile(self):
+        if path.exists("treasure.json"):
+            remove("treasure.json")
 
     def magicitems(self):
         rollnumber = getrichness()
@@ -227,8 +258,6 @@ class Controller:
             self.mais.addmoney(typ, amount)
 
 
-def output(object, objecttype):
-    pass
 
 
 def getnumberofrolls():
