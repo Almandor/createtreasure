@@ -20,6 +20,7 @@ from os import path, remove
 import logging
 import json
 
+
 class filewriter:
     def __init__(self):
         self.items = {}
@@ -41,7 +42,7 @@ class filewriter:
         if len(self.money) > 0:
             self.final.append(self.money)
         with open("treasure.json", "a") as outfile:
-            json.dump(self.final, outfile)
+            json.dump(self.final, outfile, indent=4)
 
 class ItemAndMoneyStore:
     def __init__(self):
@@ -231,8 +232,6 @@ class Controller:
             self.filewriter.add("money", self.mais.getmoney())
         self.filewriter.finalize()
 
-
-
     def deletefile(self):
         if path.exists("treasure.json"):
             remove("treasure.json")
@@ -256,8 +255,6 @@ class Controller:
         for i in range(1, rollnumber):
             amount, typ = getmoney(self.quality)
             self.mais.addmoney(typ, amount)
-
-
 
 
 def getnumberofrolls():
