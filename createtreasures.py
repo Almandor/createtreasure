@@ -79,7 +79,6 @@ class ItemAndMoneyStore:
         for key in self.moneyorderlist:
             if key in self.money:
                 mymoneydict[str(key)] = str(self.money[key])
-                print(key + ": " + str(self.money[key]))
         final = {"money": mymoneydict}
         return final
 
