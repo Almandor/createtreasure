@@ -34,9 +34,6 @@ class filewriter:
             self.money = value
 
     def finalize(self):
-        print("------------------------------")
-        print(self.items)
-        print(self.money)
         if len(self.items) > 0:
             self.final.append(self.items)
         if len(self.money) > 0:
