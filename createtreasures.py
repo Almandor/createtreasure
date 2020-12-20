@@ -21,7 +21,7 @@ import logging
 import json
 
 
-class filewriter:
+class Filewriter:
     def __init__(self):
         self.items = {}
         self.money = {}
@@ -40,6 +40,7 @@ class filewriter:
             self.final.append(self.money)
         with open("treasure.json", "a") as outfile:
             json.dump(self.final, outfile, indent=4)
+
 
 class ItemAndMoneyStore:
     def __init__(self):
@@ -194,9 +195,6 @@ class Item:
                 buffer.fill()
                 self.item["spells"].append(buffer)
 
-
-
-
     def getitem(self):
         return self.item
 
@@ -217,7 +215,7 @@ class Controller:
         self.quality = quality
         self.mais = ItemAndMoneyStore()
         self.deletefile()
-        self.filewriter = filewriter()
+        self.filewriter = Filewriter()
         if self.selection.lower() in ["magic", "both"]:
             self.magicitems()
         if self.selection.lower() in ["money", "both"]:
