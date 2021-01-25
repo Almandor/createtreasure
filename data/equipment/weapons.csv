@@ -1,60 +1,60 @@
-"Cost","Weight"
-"Axe",1
-"Bastard Sword",45
-"Battle Axe",2
-"Blackjack",6
-"Blowpipe",1
-"Boar Spear",1
-"Bola Spear (2 handed)",1
-"Boomerang",12
-"Broadsword",3
-"Cat-of-nine tails",1
-"Claymore",3
-"Club",6
-"Composite Bow",14
-"Crossbow, Hvy.",16
-"Crossbow, Lt.",7
-"Cudgel",12
-"Cutlass",2
-"Dagger",1
-"Dart",6
-"Dirk",1
-"Falchion",3
-"Flail",5
-"Foil",5
-"Halbard",2
-"Handaxe",1
-"Harpoon",1
-"Javelin",1
-"Jo",12
-"Katana",5
-"Lance",1
-"Lasso",6
-"Long Bow",9
-"Long Sword",4
-"Mace",2
-"Main Gauche",3
-"Morning",2
-"Net (fishing)",3
-"Net (gladiator)",7
-"No-dachi",6
-"Nunchaku",1
-"Pick",2
-"Pilum",2
-"Quarterstaff",1
-"Rapier",5
-"Sabre",2
-"Sai",4
-"Scimitar",3
-"Short Bow",3
-"Short Sword",2
-"Shuriken",1
-"Sling",12
-"Spear",1
-"Tomahawk",12
-"Tonfa",1
-"Trident",2
-"Two-Hand Sword",5
-"War Hammer",2
-"War Mattock",2
-"Whip",12
+item,weight
+Axe,4-6 lbs.
+Bastard Sword,4-6 lbs.
+Battle Axe,5-9 lbs.
+Blackjack,0.5 lbs.
+Blowpipe,2-4 lbs.
+Boar Spear,3-6 lbs.
+Bola (2 handed),2-6 lbs.
+Boomerang,0.5 lbs.
+Broadsword,3-5 lbs.
+Cat-o’-nine tails,3-5 lbs.
+Claymore,5-10 lbs.
+Club,3-7 lbs.
+Composite Bow,2-3 lbs.
+Crossbow  Hvy,8-12 lbs.
+Crossbow  Lt.,4-8 lbs.
+Cudgel,2-4 lbs.
+Cutlass,3-5 lbs.
+Dagger,0.75 lbs.
+Dart,0.5-1 lbs.
+Dirk,0.75 lbs.
+Falchion,3.5-5 lbs.
+Flail,4-8 lbs.
+Foil,2-3.5 lbs.
+Halbard,6-9 lbs.
+Handaxe,4-6 lbs.
+Harpoon,4-8 lbs.
+Javelin,3-5 lbs.
+Jo,2.5-6 lbs.
+Katana,4-6 lbs.
+Lance,8-15 lbs.
+Lasso,2-5 lbs.
+Long Bow,2-3 lbs.
+Long Sword,3.5-8 lbs.
+Mace,3.5-8 lbs.
+Main Gauche,1-2 lbs.
+Morning Star,4-8 lbs.
+Net (fishing),3-5 lbs.
+Net (gladiator),2-4 lbs.
+No-dachi,5-9 lbs.
+Nunchaku,1-2 lbs.
+Pick,3-7 lbs.
+Pilum,4-7 lbs.
+Quarterstaff,3-5 lbs.
+Rapier,1.5-3 lbs.
+Sabre,3-4 lbs.
+Sai,2-4 lbs.
+Scimitar,3-5 lbs.
+Short Bow,2-3 lbs.
+Short Sword,2-4 lbs.
+Shuriken,0.25-0.75 lbs.
+Sling,0.5-1 lbs.
+Spear,3-8 lbs.
+Tomahawk,2-4 lbs.
+Tonfa,2-5 lbs.
+Trident,4-6 lbs.
+Two-Hand Sword,5-12 lbs.
+War Hammer,4-7 lbs.
+War Mattock,4-8 lbs.
+Whip,2-5 lbs.

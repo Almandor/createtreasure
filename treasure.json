@@ -1,0 +1,182 @@
+[
+    {
+        "items": {
+            "item_1": {
+                "itemtype": "Leg Greaves"
+            },
+            "item_2": {
+                "itemtype": "Leather Jerkin"
+            },
+            "item_3": {
+                "itemtype": "Breastplate"
+            },
+            "item_4": {
+                "itemtype": "Sabre"
+            },
+            "item_5": {
+                "itemtype": "Soft Leather Armor",
+                "bonus": "+10(M)"
+            },
+            "item_6": {
+                "itemtype": "Falchion"
+            },
+            "item_7": {
+                "itemtype": "Plate Armor",
+                "weightreduction": "70%",
+                "bonus": "+10"
+            },
+            "item_8": {
+                "itemtype": "Staff",
+                "weightreduction": "60%"
+            },
+            "item_9": {
+                "itemtype": "rod",
+                "spell_1": {
+                    "Spelllist": "Cloaking",
+                    "Listcategory": "Open Lists",
+                    "Spellcategory": "Mentalism",
+                    "Level": "4",
+                    "Description": "No Data in File: ./data/magic/Mentalism_Open/Cloaking.csv",
+                    "Uses": "",
+                    "Itemtype": "rod",
+                    "Name": "",
+                    "AoE": "None",
+                    "Duration": "None",
+                    "Type": "None",
+                    "Range": "None"
+                }
+            },
+            "item_10": {
+                "itemtype": "Harpoon",
+                "bonus": "+10"
+            },
+            "item_11": {
+                "itemtype": "Javelin",
+                "bonus": "+15"
+            },
+            "item_12": {
+                "itemtype": "No-dachi",
+                "bonus": "+5(M)",
+                "spell_1": {
+                    "Spelllist": "Rapid Ways",
+                    "Listcategory": "Closed Lists",
+                    "Spellcategory": "Essence",
+                    "Level": "7",
+                    "Description": "As Speed I, except duration is 3 rounds split among one to three targets (in any combination).",
+                    "Uses": "",
+                    "Itemtype": "No-dachi",
+                    "Name": "Speed III *",
+                    "AoE": "varies",
+                    "Duration": "varies",
+                    "Type": "None",
+                    "Range": "10'"
+                }
+            },
+            "item_13": {
+                "itemtype": "Plate Armor",
+                "weightreduction": "40%",
+                "spell_1": {
+                    "Spelllist": "Spell Enhancement",
+                    "Listcategory": "Closed Lists",
+                    "Spellcategory": "Essence",
+                    "Level": "4",
+                    "Description": "Causes the next spell that the caster casts (within 1 minute) to have its range increased by 50'. This spell is not cumulative with any other Ranging spells.",
+                    "Uses": "",
+                    "Itemtype": "Plate Armor",
+                    "Name": "Ranging I",
+                    "AoE": "1 spell",
+                    "Duration": "varies",
+                    "Type": "None",
+                    "Range": "self"
+                }
+            },
+            "item_14": {
+                "itemtype": "Ring (DB)",
+                "bonus": "Special"
+            },
+            "item_15": {
+                "itemtype": "potion",
+                "spell_1": {
+                    "Spelllist": "Spell Defense",
+                    "Listcategory": "Open Lists",
+                    "Spellcategory": "Channeling",
+                    "Level": "1",
+                    "Description": "Subtracts 5 from elemental attack rolls against the target, and adds 5 to all of the target's RRs versus spells.",
+                    "Uses": "",
+                    "Itemtype": "potion",
+                    "Name": "Protection I",
+                    "AoE": "1 target",
+                    "Duration": "1 min/lvl",
+                    "Type": "None",
+                    "Range": "10'"
+                }
+            },
+            "item_16": {
+                "itemtype": "Bridle (Riding)",
+                "bonus": "+10"
+            },
+            "item_17": {
+                "itemtype": "Blowpipe",
+                "bonus": "Special",
+                "weightreduction": "60%"
+            },
+            "item_18": {
+                "itemtype": "Quarterstaff",
+                "bonus": "+10",
+                "spell_1": {
+                    "Spelllist": "Fire Law",
+                    "Listcategory": "Magician Base Lists",
+                    "Spellcategory": "Essence",
+                    "Level": "3",
+                    "Description": "Causes any wood to ignite and burn. All wood ignited must be within 1' of caster's palm.",
+                    "Uses": "",
+                    "Itemtype": "Quarterstaff",
+                    "Name": "Woodfires",
+                    "AoE": "1'R",
+                    "Duration": "----",
+                    "Type": "None",
+                    "Range": "self "
+                }
+            },
+            "item_19": {
+                "itemtype": "Disarm Trap Kit",
+                "bonus": "+5",
+                "spell_1": {
+                    "Spelllist": "Muscle Law",
+                    "Listcategory": "Closed Lists",
+                    "Spellcategory": "Channeling",
+                    "Level": "1",
+                    "Description": "Caster acquires a complete understanding of any muscle damage, including the tools and methods required for healing; caster does not receive the skill or power to perform the cure.",
+                    "Uses": "",
+                    "Itemtype": "Disarm Trap Kit",
+                    "Name": "Muscle Lore",
+                    "AoE": "1 target",
+                    "Duration": "---",
+                    "Type": "None",
+                    "Range": "touch"
+                }
+            },
+            "item_20": {
+                "itemtype": "Falchion",
+                "bonus": "+5(M)",
+                "spell_1": {
+                    "Spelllist": "Delving Ways",
+                    "Listcategory": "Open Lists",
+                    "Spellcategory": "Essence",
+                    "Level": "10",
+                    "Description": "Gives significant details about an item's construc- tion and purpose (not specific powers).",
+                    "Uses": "",
+                    "Itemtype": "Falchion",
+                    "Name": "Delving",
+                    "AoE": "1 item",
+                    "Duration": "---",
+                    "Type": "None",
+                    "Range": "touch"
+                }
+            },
+            "item_21": {
+                "itemtype": "Tome"
+            }
+        }
+    }
+]

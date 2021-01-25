@@ -16,9 +16,57 @@ import csv
 import random
 from sys import exit
 import pprint
-from os import path, remove
+from os import path, remove, walk
 import logging
 import json
+
+
+class DeliverItemFromFile:
+    '''
+    Läd das equipment und liefert einen Gegenstand basierend auf übergebener Parameter zurück.
+    Parameter betreffen Typ (armor, weapon...) und / oder Gewichtkategorie (rod, staff, wand...)
+    Für jeden Parameter kann RANDOM übergeben werden und die Klasse sucht sich per Zufall einen Gegenstand aus.
+    '''
+    def __init__(self):
+        self.filepath = './data/equipment/'
+        self.datafiles = []
+        self.datastore = {}
+        self.lookupfiles()
+        self.readdata()
+        self.sampleweights = [("rod", 2), ("wand", 0.5), ("staff", 5)]
+
+    def lookupfiles(self):
+        for root, dirs, files in walk(self.filepath):
+            for file in files:
+                if file.endswith(".csv"):
+                    self.datafiles.append(file)
+
+    def readdata(self):
+        for file in self.datafiles:
+            self.temp = []
+            self.counter = 0
+            f = open(self.filepath + file, "r")
+            for row in f:
+                # print(row)
+                self.counter += 1
+                if self.counter == 1:
+                    continue
+                self.shorttemp = row.strip("\n").strip(" lbs.")
+                self.temp.append(tuple(self.shorttemp.split(",")))
+            f.close()
+            self.datastore[str(file)[:-4]] = self.temp
+
+    def output(self, etype):
+        if etype == "weapon":
+            etype = "weapons"
+        if etype == "random":
+            typelist = []
+            for item in self.datafiles:
+                typelist.append(path.splitext(item)[0])
+            etype = typelist[random.randint(0, len(typelist) - 1)]
+
+        selected = random.randint(0, len(self.datastore[etype]) - 1)
+        return self.datastore[etype][selected][0]
 
 
 class Filewriter:
@@ -82,7 +130,6 @@ class ItemAndMoneyStore:
                 mymoneydict[str(key)] = str(self.money[key])
         final = {"money": mymoneydict}
         return final
-
 
     def getitems(self):
         counter = 0
@@ -158,6 +205,8 @@ class Item:
 
     def __init__(self, itemtype):
 
+        getnormalitem = DeliverItemFromFile()
+
         self.item = {
             "itemtype": itemtype
         }
@@ -194,6 +243,14 @@ class Item:
                 buffer = self.Spell(self.item["itemtype"])
                 buffer.fill()
                 self.item["spells"].append(buffer)
+
+            if item.lower() == 'normal':
+                self.item["itemtype"] = getnormalitem.output("random")
+
+            if self.item["itemtype"].lower() == 'weapon':
+                self.item["itemtype"] = getnormalitem.output("weapon")
+
+
 
     def getitem(self):
         return self.item
@@ -768,7 +825,7 @@ def getspellfromfile(listcategory, spelllist, level, spellcategory):
             count = 0
 
         if count > 1:
-            with open(filepath) as csvfile:
+            with open(filepath, encoding="utf8") as csvfile:
                 save = {}
                 file = csv.DictReader(csvfile, delimiter=',', quotechar='"')
                 if level.endswith("HL"):

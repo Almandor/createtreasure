@@ -1,36 +1,38 @@
-"Type","Weight"
-"Leather Jerkin",12
-"Arm Greaves",3
-"Leg Greaves",4
-"Leather Coat",20
-"Rein. Leather Coat",25
-"Rein. Full Leather Coat",30
-"Leather Breastplate",18
-"Chain Shirt",25
-"Full Chain*",50
-"Chain Hauberk",40
-"Breastplate",30
-"Half Plate",70
-"Full Plate*",85
-"Target Shield",10
-"Normal Shield",20
-"Full Shield",30
-"Wall Shield",50
-"Leather Helmet",2
-"Superior Leather Helm","2,5"
-"Plate Helm",3
-"Pot Helm",3
-"Full Helm",5
-"Visored Helm",5
-"Aventail",1
-"Leather Barding",100
-"Chain Barding",160
-"Plate Barding",190
-"Leather Chanfron",15
-"Plate Chanfron",25
-"Leather Crinet",25
-"Chain Crinet",31
-"Plate Crinet",38
-"Leather Bracer","0,5"
-"Plate Bracer","0,75"
-"Metal Gauntlet","0,5"
+item,weight
+Arm Greaves,2-3 lbs.
+Aventail,1 lb.
+Breastplate,20-30 lbs.
+Chain Barding,160 lbs.
+Chain Crinet,31 lbs.
+Chain Hauberk,35-40 lbs.
+Chain Shirt,15-25 lbs.
+Full Chain,35-50 lbs.
+Full Helm,2.5-5 lbs.
+Full Hide Plate,25-45 lbs.
+Full Plate,60-85 lbs.
+Full Shield,15-30 lbs.
+Half Hide Plate,20-34 lbs.
+Half Plate,50-70 lbs.
+Leather Barding,100 lbs.
+Leather Bracer,0.5 lbs.
+Leather Breastplate,10-18 lbs.
+Leather Chanfron,15 lbs.
+Leather Coat,15-20 lbs.
+Leather Crinet,25 lbs.
+Leather Helmet,1-2 lbs.
+Leather Jerkin,7-12 lbs.
+Leg Greaves,3-4 lbs.
+Metal Gauntlet,0.5 lbs.
+Normal Shield,10-20 lbs.
+Plate Barding,190 lbs.
+Plate Bracer,0.75 lbs.
+Plate Chanfron,25 lbs.
+Plate Crinet,38 lbs.
+Plate Helm,1.5-3 lbs.
+Pot Helm,1.5-3 lbs.
+Rein. Full Lthr Coat,19-30 lbs.
+Rein. Leather Coat,17-25 lbs.
+Super. Leather Helm,1.5-2.5 lbs.
+Target Shield,3-10 lbs.
+Visored Helm,2-5 lbs.
+Wall Shield,30-50 lbs.
