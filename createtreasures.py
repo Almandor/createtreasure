@@ -133,12 +133,12 @@ class ItemAndMoneyStore:
 
     def getitems(self):
         counter = 0
-        itemdict = {}
+        itemlist = []
         for item in self.itemlist:
             counter += 1
             a = item.getitem()
-            itemname = "item_" + str(counter)
-            itemdict[itemname] = {}
+            # itemname = "item_" + str(counter)
+            dummydict = {}
             for key, values in a.items():
                 if key == "spells":
                     spellcounter = 0
@@ -150,11 +150,13 @@ class ItemAndMoneyStore:
                         data = value.output()
                         for element in data:
                             spelllist[spellname][str(element)] = str(data[element])
-                        itemdict[itemname][spellname] = spelllist[spellname]
+                        dummydict[spellname] = spelllist[spellname]
                 else:
-                    itemdict[itemname][str(key)] = str(values)
+                    dummydict[str(key)] = str(values)
+                itemlist.append(dummydict)
+                dummydict = {}
         print("Generated " + str(counter) + " items")
-        final = {"items": itemdict}
+        final = {"items": itemlist}
         return final
 
 
