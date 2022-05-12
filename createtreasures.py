@@ -849,14 +849,14 @@ def getspellfromfile(listcategory, spelllist, level, spellcategory):
         return ""
 
 # Main
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate Treasure")
+    parser.add_argument('treasuretype', choices=["money", "magic", "both", "debug"], type=str)
+    parser.add_argument('treasurequality', choices=range(1, 6), type=int, nargs="?")
+    args = parser.parse_args()
 
-parser = argparse.ArgumentParser(description="Generate Treasure")
-parser.add_argument('treasuretype', choices=["money", "magic", "both", "debug"], type=str)
-parser.add_argument('treasurequality', choices=range(1, 6), type=int, nargs="?")
-args = parser.parse_args()
-
-mode = "debug"
-random.seed()
+    mode = "debug"
+    random.seed()
 
 
-control = Controller(args.treasuretype, args.treasurequality)
+    control = Controller(args.treasuretype, args.treasurequality)
