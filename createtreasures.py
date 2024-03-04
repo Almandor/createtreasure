@@ -269,10 +269,12 @@ class Item:
 
 
 class Controller:
-    def __init__(self, selection, quality):
+    def __init__(self, selection, quality, logger):
         self.selection = selection
         self.quality = quality
         self.mais = ItemAndMoneyStore()
+        self.logger = logger
+        self.logger.info("controller started with selection: " + str(selection) + " and quality: " + str(quality))
         self.deletefile()
         self.filewriter = Filewriter()
         if self.selection.lower() in ["magic", "both"]:
@@ -299,23 +301,24 @@ class Controller:
                     self.mais.additem(Item(getcomposition(counter - 1)))
 
     def money(self):
-        rollnumber = getnumberofrolls()
+        rollnumber = getnumberofrolls(self.logger)
 
         if not self.quality or not 1 <= int(self.quality) <= 5:
             print("Please make Treasurequality between 1 and 5")
             exit()
 
         for i in range(1, rollnumber):
-            amount, typ = getmoney(self.quality)
+            amount, typ = getmoney(self.quality, self.logger)
             self.mais.addmoney(typ, amount)
 
 
-def getnumberofrolls():
+def getnumberofrolls(logger):
     '''
     Randomizes number of roles from Wealth Treasure Size Chart.
     Returns Result
     :return:
     '''
+    logger.info("Getting number of rolls")
     numberofrolls = (((1, 30), 1),
                      ((31, 55), 2),
                      ((56, 75), 3),
@@ -325,9 +328,10 @@ def getnumberofrolls():
                      ((100, 100), 7))
 
     x = random.randrange(1, 100)
-
+    logger.inof("Result of Random: " + str(x))
     for i in numberofrolls:
         if i[0][0] <= x <= i[0][1]:
+            logger.info("Number of Rolls: " + str(i[1]))
             return i[1]
 
 
@@ -770,7 +774,8 @@ def getspelllevel(type):
 
     return result[type][selected]
 
-def getmoney(treasurequality):
+def getmoney(treasurequality, logger):
+    logger.info("getmoney - Quality: " + str(treasurequality))
     money = (((1, 10), (50, "ZS"), (500, "ZS"), (1000, "ZS"), (5000, "ZS"), (10000, "ZS")),
              ((11, 20), (100, "ZS"), (1500, "ZS"), (3000, "ZS"), (7500, "ZS"), (5000, "KS")),
              ((21, 30), (500, "ZS"), (2500, "ZS"), (5000, "ZS"), (1000, "KS"), (10000, "KS")),
@@ -792,9 +797,11 @@ def getmoney(treasurequality):
              ((100, 100), (10, "Ed"), (25, "Sch"), (100, "Sch"), (500, "Sch"), (1000, "Sch")))
 
     x = random.randrange(1, 100)
+    logger.info("getmoney - Random: " + str(x))
     for select in money:
         if select[0][0] <= x <= select[0][1]:
             item = select[treasurequality]
+    logger.info("getmoney - Money: " + str(item))
     return item
 
 
@@ -848,6 +855,15 @@ def getspellfromfile(listcategory, spelllist, level, spellcategory):
     else:
         return ""
 
+def createtreasure(treasurtype, treasurequality):
+    #initiate logging
+    logging.basicConfig(filename="createtreasures.log", level=logging.DEBUG, filemode="w")
+    logging.debug("Start")
+    logger = logging.getLogger("createtreasures")
+
+    random.seed()
+    control = Controller(treasurtype, treasurequality, logger)
+
 # Main
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate Treasure")
@@ -855,8 +871,4 @@ if __name__ == "__main__":
     parser.add_argument('treasurequality', choices=range(1, 6), type=int, nargs="?")
     args = parser.parse_args()
 
-    mode = "debug"
-    random.seed()
-
-
-    control = Controller(args.treasuretype, args.treasurequality)
+    createtreasure(args.treasuretype, args.treasurequality)
