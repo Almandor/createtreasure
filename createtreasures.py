@@ -72,37 +72,43 @@ class DeliverItemFromFile:
             return
 
         for file in self.datafiles:
-            self.temp = []
-            self.counter = 0
+            temp = []
             full_path = path.join(self.filepath, file)
             self.logger.info(f"Reading equipment data from: {full_path}")
+
             try:
-                # Use utf8 encoding for broader compatibility
-                with open(full_path, "r", encoding='utf8', errors='ignore') as f:
-                    for row in f:
-                        self.counter += 1
-                        if self.counter == 1: # Skip header row
-                            continue
-                        # Clean the raw row and split
-                        self.shorttemp = row.strip("\n").strip(" lbs.") # Original cleaning
-                        # Apply artifact cleaning to each element after splitting
+                with open(full_path, "r", encoding="utf8", errors="replace", newline="") as f:
+                    reader = csv.reader(f, delimiter=",", quotechar='"')
+                    header = next(reader, None)  # Skip header row
+                    if not header:
+                        self.logger.warning(f"Empty file or missing header: {full_path}")
+                        self.datastore[path.splitext(file)[0]] = []
+                        continue
+
+                    for row_idx, row in enumerate(reader, start=2):  # start=2 because header is line 1
                         try:
-                            cleaned_tuple = tuple(clean_csv_string(item) for item in self.shorttemp.split(","))
-                            self.temp.append(cleaned_tuple)
+                            # Clean each cell
+                            cleaned = [clean_csv_string(cell) for cell in row]
+
+                            # Optional: remove weight suffix if your last column contains it
+                            # If not applicable, delete these 2 lines.
+                            if cleaned and cleaned[-1].endswith(" lbs."):
+                                cleaned[-1] = cleaned[-1].removesuffix(" lbs.").strip()
+
+                            temp.append(tuple(cleaned))
                         except Exception as e:
-                             self.logger.error(f"Error processing row {self.counter} in {file}: '{row.strip()}' - {e}")
+                            self.logger.error(f"Error processing row {row_idx} in {file}: {row} - {e}")
 
             except FileNotFoundError:
-                 self.logger.error(f"Could not open equipment file: {full_path}")
-                 continue # Skip to next file if one is missing
+                self.logger.error(f"Could not open equipment file: {full_path}")
+                continue
             except Exception as e:
-                 self.logger.error(f"Error reading file {full_path}: {e}")
-                 continue
+                self.logger.error(f"Error reading file {full_path}: {e}")
+                continue
 
-            # Store data using filename without extension as key
-            data_key = path.splitext(file)[0]
-            self.datastore[data_key] = self.temp
-            self.logger.info(f"Loaded {len(self.temp)} items into datastore key '{data_key}'")
+        data_key = path.splitext(file)[0]
+        self.datastore[data_key] = temp
+        self.logger.info(f"Loaded {len(temp)} items into datastore key '{data_key}'")
 
     def output(self, etype):
         original_etype = etype
@@ -349,10 +355,11 @@ class Item:
             # Return a copy to prevent modification of internal state if needed
             return self.data.copy()
 
-    def __init__(self, itemtype, logger):
+    def __init__(self, itemtype, logger, equipment_repo):
         # Get an instance of DeliverItemFromFile (requires logger)
-        getnormalitem = DeliverItemFromFile(logger)
         self.logger = logger
+        self.equipment_repo = equipment_repo
+        getnormalitem = self.equipment_repo
         self.item = {
             "base_item_type_from_table": "None", # Helps track origin if needed
             "itemtype": itemtype # The initial type (Bonus, Spell, Normal, etc.)
@@ -363,7 +370,7 @@ class Item:
         base_item_set = False # Flag to track if a base item (weapon, armor etc.) is set
 
         # Determine additional capabilities
-        if self.item["itemtype"].lower() in ["bonus", "light", "sp. bonus"]:
+        if self.item["itemtype"].lower() in ["Bonus", "Light", "Sp. Bonus"]:
              # Pass logger to getadditionalmagicitemcapabilities if it needs it
             additional_caps = getadditionalmagicitemcapabilities(self.item["itemtype"])
             self.capabilities = [self.item["itemtype"]] + additional_caps
@@ -486,6 +493,7 @@ class Controller:
         self.mais = ItemAndMoneyStore()
         self.logger = logger
         self.logger.info(f"Controller started. Selection: '{selection}', Quality: {quality}")
+        self.equipment_repo = DeliverItemFromFile(logger)
 
         # Delete existing file before generation
         self.deletefile()
@@ -551,7 +559,7 @@ class Controller:
                     # Pass logger to getcomposition and Item constructor
                     item_type = getcomposition(richness_level, self.logger)
                     if item_type: # Ensure a valid type was returned
-                        new_item = Item(item_type, self.logger)
+                        new_item = Item(item_type, self.logger, self.equipment_repo)
                         self.mais.additem(new_item) # Add the Item object
                         total_items_generated += 1
                     else:
